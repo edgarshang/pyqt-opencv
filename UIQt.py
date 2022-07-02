@@ -127,11 +127,13 @@ class UI_Image(QWidget):
     def onButtonClick(self, btn):
         # print("the button is ", btn.text())
         if btn.text() == "cal":
-            if len(self.srcImagePath.strip()) > 0:
-                # imageInfo = (self.srcImagePath, self.combox.currentText(), self.wightLineEdit.text(), self.highLineEdit.text(), self.bitcombox.currentText())
+            print(self.leftlist.currentItem().text())
+            if self.leftlist.currentItem().text() == "Demosic":
+                print("Demosic")
                 imageInfo = {
+                    "funcType": self.leftlist.currentItem().text(),
                     "namePath": self.srcImagePath,
-                    "typeCal": self.combox.currentText(),
+                    "typeCal": "Demosic",
                     "width": self.wightLineEdit.text(),
                     "height": self.highLineEdit.text(),
                     "bit": self.bitcombox.currentText(),
@@ -140,14 +142,24 @@ class UI_Image(QWidget):
                 }
                 str = self.process.imageprocess(imageInfo)
                 self.dstImageLab.setPixmap(QPixmap(str))
-            else:
-                print("str is None")
+            elif self.leftlist.currentItem().text() == "滤波":
+                if len(self.srcImagePath.strip()) > 0:
+                    imageInfo = {
+                        "funcType": self.leftlist.currentItem().text(),
+                        "namePath": self.srcImagePath,
+                        "typeCal": self.combox.currentText(),
+                    }
+                    str = self.process.imageprocess(imageInfo)
+                    self.dstImageLab.setPixmap(QPixmap(str))
+                else:
+                    print("str is None")
 
         if btn.text() == "OpenFile":
             self.srcImagePath, _ = QFileDialog.getOpenFileName(
-                self, "Open file", QDir.currentPath(), "Image files (*.jpg *.gif *.raw)"
+                self, "Open file", QDir.currentPath(), "Image files (*.jpg *.gif *.raw *.bin)"
             )
-            self.srcImageLab.setPixmap(QPixmap(self.srcImagePath))
+            if self.leftlist.currentItem().text() != "Demosic":
+                self.srcImageLab.setPixmap(QPixmap(self.srcImagePath))
 
     def setImagePorcess(self, imgprocess):
         self.process = imgprocess
