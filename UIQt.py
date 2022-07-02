@@ -1,9 +1,12 @@
+from logging import warning
 import this
 from PyQt5.QtWidgets import *
 from PyQt5.QtCore import *
 from PyQt5.QtGui import *
 
 import sys
+
+from yaml import warnings
 from Iimageprocess import Process
 
 
@@ -24,6 +27,7 @@ class UI_Image(QWidget):
         self.leftlist.insertItem(0, "滤波")
         self.leftlist.insertItem(1, "Demosic")
         self.leftlist.insertItem(2, "Canny")
+        self.leftlist.insertItem(3, "阈值处理")
 
         self.stacklayout = QHBoxLayout()
 
@@ -44,6 +48,10 @@ class UI_Image(QWidget):
         self.statckCannyDetect = QWidget()
         self.Stack.addWidget(self.statckCannyDetect)
         self.CannyedgeDetectionUI()
+
+        self.stackThresholding = QWidget()
+        self.Stack.addWidget(self.stackThresholding)
+        self.ThresholdingUI()
 
         self.leftlist.currentRowChanged.connect(self.display)
 
@@ -82,6 +90,25 @@ class UI_Image(QWidget):
 
     def display(self, i):
         self.Stack.setCurrentIndex(i)
+
+    def ThresholdingUI(self):
+        self.thresholdFormLayout = QFormLayout()
+        self.thresholdLabel = QLabel("阈值类型:")
+        self.thresholdCombox = QComboBox()
+        self.thresholdCombox.setObjectName("阈值")
+        self.thresholdCombox.addItems(
+            ["二值化", "反二值化", "截断阈值", "超阈值零", "低阈值零", "自适应阈值", "Otsu"]
+        )
+        self.thresholdLabelVal = QLabel("阈值:")
+        self.thresholdEditVal = QLineEdit("127")
+        self.thresholdLabelMaxVal = QLabel("MaxVal:")
+        self.thresholdEditMaxVal = QLineEdit("255")
+        self.thresholdFormLayout.addRow(self.thresholdLabel, self.thresholdCombox)
+        self.thresholdFormLayout.addRow(self.thresholdLabelVal, self.thresholdEditVal)
+        self.thresholdFormLayout.addRow(
+            self.thresholdLabelMaxVal, self.thresholdEditMaxVal
+        )
+        self.stackThresholding.setLayout(self.thresholdFormLayout)
 
     def CannyedgeDetectionUI(self):
         self.cannyFormLayout = QFormLayout()
@@ -137,9 +164,9 @@ class UI_Image(QWidget):
         self.typelayout.addRow(self.blacklevelLabel, self.blacklevelLineEdit)
 
         self.statckDemosic.setLayout(self.typelayout)
+
     def showImage(self, showLabel, str):
         showLabel.setPixmap(QPixmap(str))
-        pass
 
     def DemosicHandle(self):
         if len(self.srcImagePath.strip()) > 0:
@@ -159,37 +186,49 @@ class UI_Image(QWidget):
 
     def filterHandle(self):
         imageInfo = {
-                        "funcType": self.leftlist.currentItem().text(),
-                        "namePath": self.srcImagePath,
-                        "typeCal": self.combox.currentText(),
-                    }
+            "funcType": self.leftlist.currentItem().text(),
+            "namePath": self.srcImagePath,
+            "typeCal": self.combox.currentText(),
+        }
         str = self.process.imageprocess(imageInfo)
         # self.dstImageLab.setPixmap(QPixmap(str))
         self.showImage(self.dstImageLab, str)
+
     def cannyHandle(self):
         imageInfo = {
-                        "funcType": self.leftlist.currentItem().text(),
-                        "namePath": self.srcImagePath,
-                        "typeCal": "Canny",
-                        "the1": self.CannythresholdEdit1.text(),
-                        "the2": self.CannythresholdEdit2.text(),
-                    }
+            "funcType": self.leftlist.currentItem().text(),
+            "namePath": self.srcImagePath,
+            "typeCal": "Canny",
+            "the1": self.CannythresholdEdit1.text(),
+            "the2": self.CannythresholdEdit2.text(),
+        }
         str = self.process.imageprocess(imageInfo)
-        # self.dstImageLab.setPixmap(QPixmap(str))
+        self.showImage(self.dstImageLab, str)
+
+    def thresholdHandle(self):
+        imageInfo = {
+            "funcType": self.leftlist.currentItem().text(),
+            "namePath": self.srcImagePath,
+            "typeCal": "Threshold",
+            "typeThreshold": self.thresholdCombox.currentText(),
+        }
+        str = self.process.imageprocess(imageInfo)
         self.showImage(self.dstImageLab, str)
 
     def onButtonClick(self, btn):
         if btn.text() == "cal":
             print(self.leftlist.currentItem().text())
-            if self.leftlist.currentItem().text() == "Demosic":
-                print("Demosic")
-                self.DemosicHandle()
-            elif self.leftlist.currentItem().text() == "滤波":
-                if len(self.srcImagePath.strip()) > 0:
+            if len(self.srcImagePath.strip()) > 0:
+                if self.leftlist.currentItem().text() == "Demosic":
+                    self.DemosicHandle()
+                elif self.leftlist.currentItem().text() == "滤波":
                     self.filterHandle()
-            elif self.leftlist.currentItem().text() == "Canny":
-                if len(self.srcImagePath.strip()) > 0:
+                elif self.leftlist.currentItem().text() == "Canny":
                     self.cannyHandle()
+                elif self.leftlist.currentItem().text() == "阈值处理":
+                    self.thresholdHandle()
+            else:
+                print("str is None")
 
         if btn.text() == "OpenFile":
             self.srcImagePath, _ = QFileDialog.getOpenFileName(
@@ -198,8 +237,7 @@ class UI_Image(QWidget):
                 QDir.currentPath(),
                 "Image files (*.jpg *.gif *.raw *.bin)",
             )
-            if self.leftlist.currentItem().text() != "Demosic":
-                # self.srcImageLab.setPixmap(QPixmap(self.srcImagePath))
+            if not self.srcImagePath.endswith(".raw"):
                 self.showImage(self.srcImageLab, self.srcImagePath)
 
     def setImagePorcess(self, imgprocess):

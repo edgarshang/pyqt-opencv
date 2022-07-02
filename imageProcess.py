@@ -113,6 +113,10 @@ class opencvImage(Process):
         cv2.imwrite(dstname, r)
         return dstname
 
+    def thresFunc(self, imageInfo):
+        print("===========")
+        pass
+
     def imageprocess(self, imageInfo):
         functionType = imageInfo["funcType"]
 
@@ -122,3 +126,5 @@ class opencvImage(Process):
             return self.burFunc(imageInfo)
         elif functionType == "Canny":
             return self.cannyFunc(imageInfo)
+        elif functionType == "阈值处理":
+            return self.thresFunc(imageInfo)
