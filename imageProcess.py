@@ -145,7 +145,7 @@ class opencvImage(Process):
                 if imageInfo["thresAdType"] == "BINARY":
                     r = cv2.adaptiveThreshold(o, thresholdValueMax, cv2.ADAPTIVE_THRESH_MEAN_C, cv2.THRESH_BINARY, 5, 3)
                 elif imageInfo["thresAdType"] == "BINARY_INV":
-                    r = cv2.adaptiveThreshold(o, thresholdValueMax, cv2.ADAPTIVE_THRESH_MEAN_Cs, cv2.THRESH_BINARY_INV, 5, 3)
+                    r = cv2.adaptiveThreshold(o, thresholdValueMax, cv2.ADAPTIVE_THRESH_MEAN_C, cv2.THRESH_BINARY_INV, 5, 3)
         elif typeThreshold == "Otsu":
             t, r = cv2.threshold(o, 0, thresholdValueMax, cv2.THRESH_BINARY+cv2.THRESH_OTSU)
 

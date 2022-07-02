@@ -147,6 +147,14 @@ class UI_Image(QWidget):
         self.thresholdFormLayout.addRow("自适应方法", self.thresholdMethodGroupBox)
         self.thresholdFormLayout.addRow("阈值处理方式", self.thresholdTypeGroupBox)
 
+        # pIntValidator = QIntValidator(self)
+		# pIntValidator.setRange(1, 99)
+        pIntValidator = QIntValidator(self)
+        pIntValidator.setRange(1,254)
+        self.thresholdEditVal.setValidator(pIntValidator)
+        self.thresholdEditMaxVal.setValidator(pIntValidator)
+
+
         self.stackThresholding.setLayout(self.thresholdFormLayout)
 
     def CannyedgeDetectionUI(self):
@@ -157,6 +165,10 @@ class UI_Image(QWidget):
         self.CannythresholdEdit2 = QLineEdit("128")
         self.cannyFormLayout.addRow(thresholdLabel1, self.CannythresholdEdit1)
         self.cannyFormLayout.addRow(thresholdLabel2, self.CannythresholdEdit2)
+        pIntValidator = QIntValidator(self)
+        pIntValidator.setRange(1,254)
+        self.CannythresholdEdit1.setValidator(pIntValidator)
+        self.CannythresholdEdit2.setValidator(pIntValidator)
         self.statckCannyDetect.setLayout(self.cannyFormLayout)
 
     def filterUI(self):
