@@ -4,6 +4,7 @@ import cv2
 import numpy as np
 import os
 
+
 class opencvImage(Process):
 
     # def __init__(self, parent=None):
@@ -66,8 +67,8 @@ class opencvImage(Process):
         rawImage = np.fromfile(open(imageInfo["namePath"]), dtype="uint16")
         dstname = dstname.replace(".raw", ".jpg")
         rawImage = rawImage.reshape(
-                (int(imageInfo["height"]), int(imageInfo["width"]))
-            ).astype(np.float32)
+            (int(imageInfo["height"]), int(imageInfo["width"]))
+        ).astype(np.float32)
         print(rawImage.shape)
         rawImage = rawImage - int(imageInfo["blackLevel"])
         rawbayer = rawImage.clip(0, 2 ** int(imageInfo["bit"]) - 1)
@@ -94,7 +95,7 @@ class opencvImage(Process):
         )
         self.bgrImage = (self.bgrImage * wbgain / 256) ** (1 / 2.2) * 255 // 1
 
-        cv2.imwrite(dstname, self.bgrImage) 
+        cv2.imwrite(dstname, self.bgrImage)
         return dstname
 
     def cannyFunc(self, imageInfo):
@@ -112,7 +113,7 @@ class opencvImage(Process):
         cv2.imwrite(dstname, r)
         return dstname
 
-    def imageprocess(self,imageInfo):
+    def imageprocess(self, imageInfo):
         functionType = imageInfo["funcType"]
 
         if functionType == "Demosic":
@@ -121,6 +122,3 @@ class opencvImage(Process):
             return self.burFunc(imageInfo)
         elif functionType == "Canny":
             return self.cannyFunc(imageInfo)
-
-
-

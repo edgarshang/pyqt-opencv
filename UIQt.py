@@ -89,8 +89,8 @@ class UI_Image(QWidget):
         self.CannythresholdEdit1 = QLineEdit("32")
         thresholdLabel2 = QLabel("threshold-2:")
         self.CannythresholdEdit2 = QLineEdit("128")
-        self.cannyFormLayout.addRow(thresholdLabel1,self.CannythresholdEdit1)
-        self.cannyFormLayout.addRow(thresholdLabel2,self.CannythresholdEdit2)
+        self.cannyFormLayout.addRow(thresholdLabel1, self.CannythresholdEdit1)
+        self.cannyFormLayout.addRow(thresholdLabel2, self.CannythresholdEdit2)
         self.statckCannyDetect.setLayout(self.cannyFormLayout)
 
     def filterUI(self):
@@ -137,57 +137,70 @@ class UI_Image(QWidget):
         self.typelayout.addRow(self.blacklevelLabel, self.blacklevelLineEdit)
 
         self.statckDemosic.setLayout(self.typelayout)
+    def showImage(self, showLabel, str):
+        showLabel.setPixmap(QPixmap(str))
+        pass
 
-    def onButtonClick(self, btn):
-        # print("the button is ", btn.text())
-        if btn.text() == "cal":
-            print(self.leftlist.currentItem().text())
-            if self.leftlist.currentItem().text() == "Demosic":
-                print("Demosic")
-                if len(self.srcImagePath.strip()) > 0:
-                    imageInfo = {
-                        "funcType": self.leftlist.currentItem().text(),
-                        "namePath": self.srcImagePath,
-                        "typeCal": "Demosic",
-                        "width": self.wightLineEdit.text(),
-                        "height": self.highLineEdit.text(),
-                        "bit": self.bitcombox.currentText(),
-                        "pattern": self.patternComBox.currentText(),
-                        "blackLevel": self.blacklevelLineEdit.text(),
-                    }
-                    str = self.process.imageprocess(imageInfo)
-                    self.dstImageLab.setPixmap(QPixmap(str))
-            elif self.leftlist.currentItem().text() == "滤波":
-                if len(self.srcImagePath.strip()) > 0:
-                    imageInfo = {
+    def DemosicHandle(self):
+        if len(self.srcImagePath.strip()) > 0:
+            imageInfo = {
+                "funcType": self.leftlist.currentItem().text(),
+                "namePath": self.srcImagePath,
+                "typeCal": "Demosic",
+                "width": self.wightLineEdit.text(),
+                "height": self.highLineEdit.text(),
+                "bit": self.bitcombox.currentText(),
+                "pattern": self.patternComBox.currentText(),
+                "blackLevel": self.blacklevelLineEdit.text(),
+            }
+            str = self.process.imageprocess(imageInfo)
+            # self.dstImageLab.setPixmap(QPixmap(str))
+            self.showImage(self.dstImageLab, str)
+
+    def filterHandle(self):
+        imageInfo = {
                         "funcType": self.leftlist.currentItem().text(),
                         "namePath": self.srcImagePath,
                         "typeCal": self.combox.currentText(),
                     }
-                    str = self.process.imageprocess(imageInfo)
-                    self.dstImageLab.setPixmap(QPixmap(str))
-                else:
-                    print("str is None")
-            elif self.leftlist.currentItem().text() == "Canny":
-                if len(self.srcImagePath.strip()) > 0:
-                    imageInfo = {
+        str = self.process.imageprocess(imageInfo)
+        # self.dstImageLab.setPixmap(QPixmap(str))
+        self.showImage(self.dstImageLab, str)
+    def cannyHandle(self):
+        imageInfo = {
                         "funcType": self.leftlist.currentItem().text(),
                         "namePath": self.srcImagePath,
                         "typeCal": "Canny",
                         "the1": self.CannythresholdEdit1.text(),
-                        "the2":self.CannythresholdEdit2.text(),
+                        "the2": self.CannythresholdEdit2.text(),
                     }
-                    str = self.process.imageprocess(imageInfo)
-                    self.dstImageLab.setPixmap(QPixmap(str))
-                else:
-                    print("path str is None")
+        str = self.process.imageprocess(imageInfo)
+        # self.dstImageLab.setPixmap(QPixmap(str))
+        self.showImage(self.dstImageLab, str)
+
+    def onButtonClick(self, btn):
+        if btn.text() == "cal":
+            print(self.leftlist.currentItem().text())
+            if self.leftlist.currentItem().text() == "Demosic":
+                print("Demosic")
+                self.DemosicHandle()
+            elif self.leftlist.currentItem().text() == "滤波":
+                if len(self.srcImagePath.strip()) > 0:
+                    self.filterHandle()
+            elif self.leftlist.currentItem().text() == "Canny":
+                if len(self.srcImagePath.strip()) > 0:
+                    self.cannyHandle()
 
         if btn.text() == "OpenFile":
             self.srcImagePath, _ = QFileDialog.getOpenFileName(
-                self, "Open file", QDir.currentPath(), "Image files (*.jpg *.gif *.raw *.bin)"
+                self,
+                "Open file",
+                QDir.currentPath(),
+                "Image files (*.jpg *.gif *.raw *.bin)",
             )
             if self.leftlist.currentItem().text() != "Demosic":
-                self.srcImageLab.setPixmap(QPixmap(self.srcImagePath))
+                # self.srcImageLab.setPixmap(QPixmap(self.srcImagePath))
+                self.showImage(self.srcImageLab, self.srcImagePath)
 
     def setImagePorcess(self, imgprocess):
         self.process = imgprocess
