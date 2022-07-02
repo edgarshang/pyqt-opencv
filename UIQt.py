@@ -23,7 +23,7 @@ class UI_Image(QWidget):
         self.leftlist = QListWidget()
         self.leftlist.insertItem(0, "滤波")
         self.leftlist.insertItem(1, "Demosic")
-        self.leftlist.insertItem(2, "直方图")
+        self.leftlist.insertItem(2, "Canny")
 
         self.stacklayout = QHBoxLayout()
 
@@ -40,6 +40,10 @@ class UI_Image(QWidget):
         self.statckDemosic = QWidget()
         self.Stack.addWidget(self.statckDemosic)
         self.rawDemosicUI()
+
+        self.statckCannyDetect = QWidget()
+        self.Stack.addWidget(self.statckCannyDetect)
+        self.CannyedgeDetectionUI()
 
         self.leftlist.currentRowChanged.connect(self.display)
 
@@ -78,6 +82,16 @@ class UI_Image(QWidget):
 
     def display(self, i):
         self.Stack.setCurrentIndex(i)
+
+    def CannyedgeDetectionUI(self):
+        self.cannyFormLayout = QFormLayout()
+        thresholdLabel1 = QLabel("threshold-1:")
+        self.CannythresholdEdit1 = QLineEdit("32")
+        thresholdLabel2 = QLabel("threshold-2:")
+        self.CannythresholdEdit2 = QLineEdit("128")
+        self.cannyFormLayout.addRow(thresholdLabel1,self.CannythresholdEdit1)
+        self.cannyFormLayout.addRow(thresholdLabel2,self.CannythresholdEdit2)
+        self.statckCannyDetect.setLayout(self.cannyFormLayout)
 
     def filterUI(self):
         self.filterTypelayout = QFormLayout()
@@ -130,18 +144,19 @@ class UI_Image(QWidget):
             print(self.leftlist.currentItem().text())
             if self.leftlist.currentItem().text() == "Demosic":
                 print("Demosic")
-                imageInfo = {
-                    "funcType": self.leftlist.currentItem().text(),
-                    "namePath": self.srcImagePath,
-                    "typeCal": "Demosic",
-                    "width": self.wightLineEdit.text(),
-                    "height": self.highLineEdit.text(),
-                    "bit": self.bitcombox.currentText(),
-                    "pattern": self.patternComBox.currentText(),
-                    "blackLevel": self.blacklevelLineEdit.text(),
-                }
-                str = self.process.imageprocess(imageInfo)
-                self.dstImageLab.setPixmap(QPixmap(str))
+                if len(self.srcImagePath.strip()) > 0:
+                    imageInfo = {
+                        "funcType": self.leftlist.currentItem().text(),
+                        "namePath": self.srcImagePath,
+                        "typeCal": "Demosic",
+                        "width": self.wightLineEdit.text(),
+                        "height": self.highLineEdit.text(),
+                        "bit": self.bitcombox.currentText(),
+                        "pattern": self.patternComBox.currentText(),
+                        "blackLevel": self.blacklevelLineEdit.text(),
+                    }
+                    str = self.process.imageprocess(imageInfo)
+                    self.dstImageLab.setPixmap(QPixmap(str))
             elif self.leftlist.currentItem().text() == "滤波":
                 if len(self.srcImagePath.strip()) > 0:
                     imageInfo = {
@@ -153,6 +168,19 @@ class UI_Image(QWidget):
                     self.dstImageLab.setPixmap(QPixmap(str))
                 else:
                     print("str is None")
+            elif self.leftlist.currentItem().text() == "Canny":
+                if len(self.srcImagePath.strip()) > 0:
+                    imageInfo = {
+                        "funcType": self.leftlist.currentItem().text(),
+                        "namePath": self.srcImagePath,
+                        "typeCal": "Canny",
+                        "the1": self.CannythresholdEdit1.text(),
+                        "the2":self.CannythresholdEdit2.text(),
+                    }
+                    str = self.process.imageprocess(imageInfo)
+                    self.dstImageLab.setPixmap(QPixmap(str))
+                else:
+                    print("path str is None")
 
         if btn.text() == "OpenFile":
             self.srcImagePath, _ = QFileDialog.getOpenFileName(

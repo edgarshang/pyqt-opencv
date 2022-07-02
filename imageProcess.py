@@ -97,6 +97,21 @@ class opencvImage(Process):
         cv2.imwrite(dstname, self.bgrImage) 
         return dstname
 
+    def cannyFunc(self, imageInfo):
+        filePath, filename = os.path.split(imageInfo["namePath"])
+        srcNamePath = imageInfo["namePath"]
+        Type = imageInfo["typeCal"]
+        dstname, filetype = os.path.splitext(filename)
+        dstname += "_" + Type + filetype
+        dstname = os.path.join(filePath, dstname)
+        print(f"dstname = {dstname}, filetype = {filetype}")
+        o = imread(srcNamePath)
+        # thres1 = int()
+        r = cv2.Canny(o, int(imageInfo["the1"]), int(imageInfo["the2"]))
+        # r = cv2.Canny(o, 32, 128)
+        cv2.imwrite(dstname, r)
+        return dstname
+
     def imageprocess(self,imageInfo):
         functionType = imageInfo["funcType"]
 
@@ -104,6 +119,8 @@ class opencvImage(Process):
             return self.demosicFunc(imageInfo)
         elif functionType == "滤波":
             return self.burFunc(imageInfo)
+        elif functionType == "Canny":
+            return self.cannyFunc(imageInfo)
 
 
 
