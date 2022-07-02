@@ -108,6 +108,45 @@ class UI_Image(QWidget):
         self.thresholdFormLayout.addRow(
             self.thresholdLabelMaxVal, self.thresholdEditMaxVal
         )
+        self.thresholdMethodGroupBox = QGroupBox("自适应方法")
+       
+        self.thresholdNibRadiobutton = QRadioButton("邻阈像素点")
+        
+        self.thresholdNibRadiobutton.toggled.connect(lambda:self.onRadioButtonToggled(self.thresholdNibRadiobutton))
+
+        self.thresholdGusRadiobutton = QRadioButton("高斯")
+        self.thresholdGusRadiobutton.setChecked(True)
+
+        self.thresholdGusRadiobutton.toggled.connect(lambda:self.onRadioButtonToggled(self.thresholdGusRadiobutton))
+
+        self.thresholdMethodVBoxLayout = QVBoxLayout()
+        self.thresholdMethodVBoxLayout.addWidget(self.thresholdNibRadiobutton)
+        self.thresholdMethodVBoxLayout.addWidget(self.thresholdGusRadiobutton)
+        self.thresholdMethodGroupBox.setLayout(self.thresholdMethodVBoxLayout)
+
+        self.thresholdTypeGroupBox = QGroupBox("thresholdType")
+
+
+
+        self.thresholdBinRadiobutton = QRadioButton("BINARY")
+        self.thresholdBinRadiobutton.setChecked(True)
+        self.thresStatusInfo = {"method" : "高斯", "thresholdType" : "BINARY"}
+
+        self.thresholdBinRadiobutton.toggled.connect(lambda:self.onRadioButtonToggled(self.thresholdBinRadiobutton))
+
+        self.thresholdBinInvRadiobutton = QRadioButton("BINARY_INV")
+
+        self.thresholdBinInvRadiobutton.toggled.connect(lambda:self.onRadioButtonToggled(self.thresholdBinInvRadiobutton))
+
+        self.thresholdTypeVBoxLayout = QVBoxLayout()
+        self.thresholdTypeVBoxLayout.addWidget(self.thresholdBinRadiobutton)
+        self.thresholdTypeVBoxLayout.addWidget(self.thresholdBinInvRadiobutton)
+        self.thresholdTypeGroupBox.setLayout(self.thresholdTypeVBoxLayout)
+
+
+        self.thresholdFormLayout.addRow("自适应方法", self.thresholdMethodGroupBox)
+        self.thresholdFormLayout.addRow("阈值处理方式", self.thresholdTypeGroupBox)
+
         self.stackThresholding.setLayout(self.thresholdFormLayout)
 
     def CannyedgeDetectionUI(self):
@@ -211,9 +250,25 @@ class UI_Image(QWidget):
             "namePath": self.srcImagePath,
             "typeCal": "Threshold",
             "typeThreshold": self.thresholdCombox.currentText(),
+            "thresholdValue":self.thresholdEditVal.text(),
+            "threshodlMaxValue":self.thresholdEditMaxVal.text(),
+            "thresAdmethod" : self.thresStatusInfo["method"],
+            "thresAdType" : self.thresStatusInfo["thresholdType"],
         }
         str = self.process.imageprocess(imageInfo)
         self.showImage(self.dstImageLab, str)
+
+    def onRadioButtonToggled(self, btn):
+        if btn.isChecked() == True:
+            print("btn.text()", btn.text())
+            if btn.text() == "高斯":
+                self.thresStatusInfo["method"] = "高斯"
+            elif btn.text() == "邻阈像素点":
+                self.thresStatusInfo["method"] = "邻阈像素点"
+            elif btn.text() == "BINARY_INV":
+                self.thresStatusInfo["thresholdType"] = "BINARY_INV"
+            elif btn.text() == "BINARY":
+                self.thresStatusInfo["thresholdType"] = "BINARY"
 
     def onButtonClick(self, btn):
         if btn.text() == "cal":
