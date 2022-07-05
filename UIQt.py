@@ -14,12 +14,12 @@ class UI_Image(QWidget):
     def __init__(self, parent=None):
         super(UI_Image, self).__init__(parent)
         self.initUI()
+        self.setWindowIcon(QIcon("./icon.png"))
         self.process = Process()
         self.srcImagePath = ""
 
     def initUI(self):
-        self.setGeometry(300, 300, 365, 280)
-        self.setWindowTitle("test")
+        self.setWindowTitle("PyQt OpenCV")
         self.openButton = QPushButton("OpenFile")
         self.openButton.clicked.connect(lambda: self.onButtonClick(self.openButton))
 
