@@ -109,15 +109,19 @@ class UI_Image(QWidget):
             self.thresholdLabelMaxVal, self.thresholdEditMaxVal
         )
         self.thresholdMethodGroupBox = QGroupBox("自适应方法")
-       
+
         self.thresholdNibRadiobutton = QRadioButton("邻阈像素点")
-        
-        self.thresholdNibRadiobutton.toggled.connect(lambda:self.onRadioButtonToggled(self.thresholdNibRadiobutton))
+
+        self.thresholdNibRadiobutton.toggled.connect(
+            lambda: self.onRadioButtonToggled(self.thresholdNibRadiobutton)
+        )
 
         self.thresholdGusRadiobutton = QRadioButton("高斯")
         self.thresholdGusRadiobutton.setChecked(True)
 
-        self.thresholdGusRadiobutton.toggled.connect(lambda:self.onRadioButtonToggled(self.thresholdGusRadiobutton))
+        self.thresholdGusRadiobutton.toggled.connect(
+            lambda: self.onRadioButtonToggled(self.thresholdGusRadiobutton)
+        )
 
         self.thresholdMethodVBoxLayout = QVBoxLayout()
         self.thresholdMethodVBoxLayout.addWidget(self.thresholdNibRadiobutton)
@@ -126,34 +130,34 @@ class UI_Image(QWidget):
 
         self.thresholdTypeGroupBox = QGroupBox("thresholdType")
 
-
-
         self.thresholdBinRadiobutton = QRadioButton("BINARY")
         self.thresholdBinRadiobutton.setChecked(True)
-        self.thresStatusInfo = {"method" : "高斯", "thresholdType" : "BINARY"}
+        self.thresStatusInfo = {"method": "高斯", "thresholdType": "BINARY"}
 
-        self.thresholdBinRadiobutton.toggled.connect(lambda:self.onRadioButtonToggled(self.thresholdBinRadiobutton))
+        self.thresholdBinRadiobutton.toggled.connect(
+            lambda: self.onRadioButtonToggled(self.thresholdBinRadiobutton)
+        )
 
         self.thresholdBinInvRadiobutton = QRadioButton("BINARY_INV")
 
-        self.thresholdBinInvRadiobutton.toggled.connect(lambda:self.onRadioButtonToggled(self.thresholdBinInvRadiobutton))
+        self.thresholdBinInvRadiobutton.toggled.connect(
+            lambda: self.onRadioButtonToggled(self.thresholdBinInvRadiobutton)
+        )
 
         self.thresholdTypeVBoxLayout = QVBoxLayout()
         self.thresholdTypeVBoxLayout.addWidget(self.thresholdBinRadiobutton)
         self.thresholdTypeVBoxLayout.addWidget(self.thresholdBinInvRadiobutton)
         self.thresholdTypeGroupBox.setLayout(self.thresholdTypeVBoxLayout)
 
-
         self.thresholdFormLayout.addRow("自适应方法", self.thresholdMethodGroupBox)
         self.thresholdFormLayout.addRow("阈值处理方式", self.thresholdTypeGroupBox)
 
         # pIntValidator = QIntValidator(self)
-		# pIntValidator.setRange(1, 99)
+        # pIntValidator.setRange(1, 99)
         pIntValidator = QIntValidator(self)
-        pIntValidator.setRange(1,254)
+        pIntValidator.setRange(1, 254)
         self.thresholdEditVal.setValidator(pIntValidator)
         self.thresholdEditMaxVal.setValidator(pIntValidator)
-
 
         self.stackThresholding.setLayout(self.thresholdFormLayout)
 
@@ -166,7 +170,7 @@ class UI_Image(QWidget):
         self.cannyFormLayout.addRow(thresholdLabel1, self.CannythresholdEdit1)
         self.cannyFormLayout.addRow(thresholdLabel2, self.CannythresholdEdit2)
         pIntValidator = QIntValidator(self)
-        pIntValidator.setRange(1,254)
+        pIntValidator.setRange(1, 254)
         self.CannythresholdEdit1.setValidator(pIntValidator)
         self.CannythresholdEdit2.setValidator(pIntValidator)
         self.statckCannyDetect.setLayout(self.cannyFormLayout)
@@ -262,10 +266,10 @@ class UI_Image(QWidget):
             "namePath": self.srcImagePath,
             "typeCal": "Threshold",
             "typeThreshold": self.thresholdCombox.currentText(),
-            "thresholdValue":self.thresholdEditVal.text(),
-            "threshodlMaxValue":self.thresholdEditMaxVal.text(),
-            "thresAdmethod" : self.thresStatusInfo["method"],
-            "thresAdType" : self.thresStatusInfo["thresholdType"],
+            "thresholdValue": self.thresholdEditVal.text(),
+            "threshodlMaxValue": self.thresholdEditMaxVal.text(),
+            "thresAdmethod": self.thresStatusInfo["method"],
+            "thresAdType": self.thresStatusInfo["thresholdType"],
         }
         str = self.process.imageprocess(imageInfo)
         self.showImage(self.dstImageLab, str)
@@ -304,7 +308,9 @@ class UI_Image(QWidget):
                 QDir.currentPath(),
                 "Image files (*.jpg *.gif *.raw *.bin)",
             )
-            if not self.srcImagePath.endswith(".raw"):
+            if not self.srcImagePath.endswith(
+                ".raw"
+            ) and not not self.srcImagePath.endswith(".bin"):
                 self.showImage(self.srcImageLab, self.srcImagePath)
 
     def setImagePorcess(self, imgprocess):
