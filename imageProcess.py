@@ -65,7 +65,10 @@ class opencvImage(Process):
         dstname = os.path.join(filePath, dstname)
         print(f"dstname = {dstname}, filetype = {filetype}")
         rawImage = np.fromfile(open(imageInfo["namePath"]), dtype="uint16")
-        dstname = dstname.replace(".raw", ".jpg")
+        if dstname.endswith(".raw"):
+            dstname = dstname.replace(".raw", ".jpg")
+        else:
+            dstname = dstname.replace(".bin", ".jpg")
         rawImage = rawImage.reshape(
             (int(imageInfo["height"]), int(imageInfo["width"]))
         ).astype(np.float32)
@@ -126,32 +129,69 @@ class opencvImage(Process):
         thresholdValue = int(imageInfo["thresholdValue"])
         thresholdValueMax = int(imageInfo["threshodlMaxValue"])
         if typeThreshold == "二值化":
-            t, r = cv2.threshold(o, thresholdValue, thresholdValueMax, cv2.THRESH_BINARY)
+            t, r = cv2.threshold(
+                o, thresholdValue, thresholdValueMax, cv2.THRESH_BINARY
+            )
         elif typeThreshold == "反二值化":
-            t, r = cv2.threshold(o, thresholdValue, thresholdValueMax, cv2.THRESH_BINARY_INV)
+            t, r = cv2.threshold(
+                o, thresholdValue, thresholdValueMax, cv2.THRESH_BINARY_INV
+            )
         elif typeThreshold == "截断阈值":
             t, r = cv2.threshold(o, thresholdValue, thresholdValueMax, cv2.THRESH_TRUNC)
         elif typeThreshold == "超阈值零":
-            t, r = cv2.threshold(o, thresholdValue, thresholdValueMax, cv2.THRESH_TOZERO_INV)
+            t, r = cv2.threshold(
+                o, thresholdValue, thresholdValueMax, cv2.THRESH_TOZERO_INV
+            )
         elif typeThreshold == "低阈值零":
-            t, r = cv2.threshold(o, thresholdValue, thresholdValueMax, cv2.THRESH_TOZERO)
+            t, r = cv2.threshold(
+                o, thresholdValue, thresholdValueMax, cv2.THRESH_TOZERO
+            )
         elif typeThreshold == "自适应阈值":
-            if imageInfo["thresAdmethod"] == "高斯":  
+            if imageInfo["thresAdmethod"] == "高斯":
                 if imageInfo["thresAdType"] == "BINARY":
-                    r = cv2.adaptiveThreshold(o, thresholdValueMax, cv2.ADAPTIVE_THRESH_GAUSSIAN_C, cv2.THRESH_BINARY, 5, 3)
+                    r = cv2.adaptiveThreshold(
+                        o,
+                        thresholdValueMax,
+                        cv2.ADAPTIVE_THRESH_GAUSSIAN_C,
+                        cv2.THRESH_BINARY,
+                        5,
+                        3,
+                    )
                 elif imageInfo["thresAdType"] == "BINARY_INV":
-                    r = cv2.adaptiveThreshold(o, thresholdValueMax, cv2.ADAPTIVE_THRESH_GAUSSIAN_C, cv2.THRESH_BINARY_INV, 5, 3)
+                    r = cv2.adaptiveThreshold(
+                        o,
+                        thresholdValueMax,
+                        cv2.ADAPTIVE_THRESH_GAUSSIAN_C,
+                        cv2.THRESH_BINARY_INV,
+                        5,
+                        3,
+                    )
             elif imageInfo["thresAdmethod"] == "邻阈像素点":
                 if imageInfo["thresAdType"] == "BINARY":
-                    r = cv2.adaptiveThreshold(o, thresholdValueMax, cv2.ADAPTIVE_THRESH_MEAN_C, cv2.THRESH_BINARY, 5, 3)
+                    r = cv2.adaptiveThreshold(
+                        o,
+                        thresholdValueMax,
+                        cv2.ADAPTIVE_THRESH_MEAN_C,
+                        cv2.THRESH_BINARY,
+                        5,
+                        3,
+                    )
                 elif imageInfo["thresAdType"] == "BINARY_INV":
-                    r = cv2.adaptiveThreshold(o, thresholdValueMax, cv2.ADAPTIVE_THRESH_MEAN_C, cv2.THRESH_BINARY_INV, 5, 3)
+                    r = cv2.adaptiveThreshold(
+                        o,
+                        thresholdValueMax,
+                        cv2.ADAPTIVE_THRESH_MEAN_C,
+                        cv2.THRESH_BINARY_INV,
+                        5,
+                        3,
+                    )
         elif typeThreshold == "Otsu":
-            t, r = cv2.threshold(o, 0, thresholdValueMax, cv2.THRESH_BINARY+cv2.THRESH_OTSU)
+            t, r = cv2.threshold(
+                o, 0, thresholdValueMax, cv2.THRESH_BINARY + cv2.THRESH_OTSU
+            )
 
         cv2.imwrite(dstname, r)
         return dstname
-
 
     def imageprocess(self, imageInfo):
         functionType = imageInfo["funcType"]
