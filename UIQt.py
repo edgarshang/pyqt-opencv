@@ -100,7 +100,7 @@ class UI_Image(QWidget):
         self.gromTransFormLayout = QFormLayout()
         self.gromTransFormCombox = QComboBox()
         self.gromTransFormCombox.addItems(
-            ["缩放","翻转","访射","透视","重映射"]
+            ["缩放","翻转","访射","旋转","透视","重映射"]
         )
         self.gromTransFormLayout.addRow("tranType:", self.gromTransFormCombox)
         self.gromTransFormDxEdit = QLineEdit("1")
@@ -121,6 +121,12 @@ class UI_Image(QWidget):
 
         self.gromTransFormLayout.addRow("PanX:", self.gromTransPanMoveX)
         self.gromTransFormLayout.addRow("PanX:", self.gromTransPanMoveY)
+
+        self.geomTransFormAngle = QLineEdit("45")
+        self.geomTransFormScale = QLineEdit("0.5")
+
+        self.gromTransFormLayout.addRow("angle:", self.geomTransFormAngle)
+        self.gromTransFormLayout.addRow("scale:", self.geomTransFormScale)
 
         uiLayout.setLayout(self.gromTransFormLayout)
 
@@ -332,6 +338,8 @@ class UI_Image(QWidget):
            "rotate": self.gromTransCombox.currentText(),
            "gemoPanx":self.gromTransPanMoveX.text(),
            "gemoPany":self.gromTransPanMoveY.text(),
+           "Angle": self.geomTransFormAngle.text(),
+           "Scale":self.geomTransFormScale.text(),
         }
         str = self.process.imageprocess(imageInfo)
         self.showImage(self.dstImageLab, str)

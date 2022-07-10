@@ -212,6 +212,10 @@ class opencvImage(Process):
             h,w = o.shape[:2]
             M = np.float32([[1,0,int(imageInfo["gemoPanx"])],[0,1,int(imageInfo["gemoPany"])]])
             r = cv2.warpAffine(o,M,(w,h))
+        elif typeGeom == "旋转":
+            h,w = o.shape[:2]
+            M = cv2.getRotationMatrix2D((w/2, h/2), int(imageInfo["Angle"]), np.double(imageInfo["Scale"]))
+            r = cv2.warpAffine(o, M, (w,h))
         elif typeGeom == "透视":
             pass
         elif typeGeom == "重映射":
