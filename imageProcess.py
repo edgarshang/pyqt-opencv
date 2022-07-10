@@ -194,6 +194,32 @@ class opencvImage(Process):
         cv2.imwrite(dstname, r)
         return dstname
 
+    def geomtransFunc(self, imageInfo):
+        filePath, filename = os.path.split(imageInfo["namePath"])
+        srcNamePath = imageInfo["namePath"]
+        Type = imageInfo["typeCal"]
+        dstname, filetype = os.path.splitext(filename)
+        dstname += "_" + Type + filetype
+        dstname = os.path.join(filePath, dstname)
+        print(f"dstname = {dstname}, filetype = {filetype}")
+        o = imread(srcNamePath)
+        typeGeom = imageInfo["typeGeom"]
+        if typeGeom == "缩放":
+            r = cv2.resize(o, None, fx=np.double(imageInfo["geomDx"]), fy=np.double(imageInfo["geomDy"]))
+        elif typeGeom == "翻转":
+            r = cv2.flip(o, int(imageInfo["rotate"]))
+        elif typeGeom == "访射":
+            h,w = o.shape[:2]
+            M = np.float32([[1,0,int(imageInfo["gemoPanx"])],[0,1,int(imageInfo["gemoPany"])]])
+            r = cv2.warpAffine(o,M,(w,h))
+        elif typeGeom == "透视":
+            pass
+        elif typeGeom == "重映射":
+            pass
+        cv2.imwrite(dstname, r)
+        return dstname
+
+
     def imageprocess(self, imageInfo):
         functionType = imageInfo["funcType"]
 
@@ -205,3 +231,5 @@ class opencvImage(Process):
             return self.cannyFunc(imageInfo)
         elif functionType == "阈值处理":
             return self.thresFunc(imageInfo)
+        elif functionType == "几何变换":
+            return self.geomtransFunc(imageInfo)

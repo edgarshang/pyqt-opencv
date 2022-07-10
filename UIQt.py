@@ -28,6 +28,7 @@ class UI_Image(QWidget):
         self.leftlist.insertItem(1, "Demosic")
         self.leftlist.insertItem(2, "Canny")
         self.leftlist.insertItem(3, "阈值处理")
+        self.leftlist.insertItem(4, "几何变换")
 
         self.stacklayout = QHBoxLayout()
 
@@ -52,6 +53,10 @@ class UI_Image(QWidget):
         self.stackThresholding = QWidget()
         self.Stack.addWidget(self.stackThresholding)
         self.ThresholdingUI()
+
+        self.stackGeomTrans = QWidget()
+        self.Stack.addWidget(self.stackGeomTrans)
+        self.GromTransFormUI(self.stackGeomTrans)
 
         self.leftlist.currentRowChanged.connect(self.display)
 
@@ -90,6 +95,35 @@ class UI_Image(QWidget):
 
     def display(self, i):
         self.Stack.setCurrentIndex(i)
+
+    def GromTransFormUI(self, uiLayout):
+        self.gromTransFormLayout = QFormLayout()
+        self.gromTransFormCombox = QComboBox()
+        self.gromTransFormCombox.addItems(
+            ["缩放","翻转","访射","透视","重映射"]
+        )
+        self.gromTransFormLayout.addRow("tranType:", self.gromTransFormCombox)
+        self.gromTransFormDxEdit = QLineEdit("1")
+        self.gromTransFormDyEdit = QLineEdit("1")
+
+        self.gromTransFormLayout.addRow("fx:", self.gromTransFormDxEdit)
+        self.gromTransFormLayout.addRow("fy:", self.gromTransFormDyEdit)
+
+        self.gromTransCombox = QComboBox()
+        self.gromTransCombox.addItems(
+            ["0","1","-1"]
+        )
+        self.gromTransCombox.setCurrentText("0")
+        self.gromTransFormLayout.addRow("rotate:", self.gromTransCombox)
+
+        self.gromTransPanMoveX = QLineEdit("100")
+        self.gromTransPanMoveY = QLineEdit("100")
+
+        self.gromTransFormLayout.addRow("PanX:", self.gromTransPanMoveX)
+        self.gromTransFormLayout.addRow("PanX:", self.gromTransPanMoveY)
+
+        uiLayout.setLayout(self.gromTransFormLayout)
+
 
     def ThresholdingUI(self):
         self.thresholdFormLayout = QFormLayout()
@@ -287,6 +321,21 @@ class UI_Image(QWidget):
         str = self.process.imageprocess(imageInfo)
         self.showImage(self.dstImageLab, str)
 
+    def geomTransform(self):
+        imageInfo = {
+           "funcType": self.leftlist.currentItem().text(),
+           "namePath": self.srcImagePath,
+           "typeCal" : "GeomTransform",
+           "typeGeom" : self.gromTransFormCombox.currentText(),
+           "geomDx" : self.gromTransFormDxEdit.text(),
+           "geomDy": self.gromTransFormDyEdit.text(),
+           "rotate": self.gromTransCombox.currentText(),
+           "gemoPanx":self.gromTransPanMoveX.text(),
+           "gemoPany":self.gromTransPanMoveY.text(),
+        }
+        str = self.process.imageprocess(imageInfo)
+        self.showImage(self.dstImageLab, str)
+
     def onRadioButtonToggled(self, btn):
         if btn.isChecked() == True:
             print("btn.text()", btn.text())
@@ -311,6 +360,8 @@ class UI_Image(QWidget):
                     self.cannyHandle()
                 elif self.leftlist.currentItem().text() == "阈值处理":
                     self.thresholdHandle()
+                elif self.leftlist.currentItem().text() == "几何变换":
+                    self.geomTransform()
             else:
                 print("str is None")
 
