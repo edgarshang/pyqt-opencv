@@ -16,6 +16,7 @@ class opencvImage(Process):
         filePath, filename = os.path.split(imageInfo["namePath"])
         srcNamePath = imageInfo["namePath"]
         burType = imageInfo["typeCal"]
+        kernelSize = int(imageInfo["kernelSize"])
         dstname, filetype = os.path.splitext(filename)
         dstname += "_" + burType + filetype
         dstname = os.path.join(filePath, dstname)
@@ -26,22 +27,22 @@ class opencvImage(Process):
             return srcNamePath
 
         elif burType == "mean":
-            r = cv2.blur(o, (5, 5))
+            r = cv2.blur(o, (kernelSize, kernelSize))
             cv2.imwrite(dstname, r)
             return dstname
 
         elif burType == "Gauss":
-            r = cv2.GaussianBlur(o, (5, 5), 0, 0)
+            r = cv2.GaussianBlur(o, (kernelSize, kernelSize), 0, 0)
             cv2.imwrite(dstname, r)
             return dstname
 
         elif burType == "box":
-            r = cv2.boxFilter(o, -1, (5, 5))
+            r = cv2.boxFilter(o, -1, (kernelSize, kernelSize))
             cv2.imwrite(dstname, r)
             return dstname
 
         elif burType == "median":
-            r = cv2.medianBlur(o, 3)
+            r = cv2.medianBlur(o, kernelSize)
             cv2.imwrite(dstname, r)
             return dstname
 
@@ -51,7 +52,7 @@ class opencvImage(Process):
             return dstname
 
         elif burType == "2D":
-            kernel = np.ones((9, 9), dtype=np.float32) / 81
+            kernel = np.ones((kernelSize, kernelSize), dtype=np.float32) / (kernelSize*kernelSize)
             r = cv2.filter2D(o, -1, kernel)
             cv2.imwrite(dstname, r)
             return dstname

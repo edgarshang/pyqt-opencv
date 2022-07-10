@@ -182,6 +182,18 @@ class UI_Image(QWidget):
         self.combox.setObjectName("滤波")
         self.combox.addItems(["None", "mean", "Gauss", "box", "2D", "median", "bil"])
         self.filterTypelayout.addRow(self.typeLabel, self.combox)
+        self.filterSlider = QSlider(Qt.Horizontal)
+        self.filterSlider.setMinimum(3)
+        self.filterSlider.setMaximum(11)
+        self.filterSlider.setSingleStep(2)
+        self.filterSlider.setValue(5)
+        self.filterSlider.setTickPosition(QSlider.TicksBelow)
+        self.filterSlider.setTickInterval(2)
+        self.kernelSizeCombox = QComboBox() 
+        self.kernelSizeCombox.addItems(["3", "5", "7", "9", "11", "13"])
+        self.kernelSizeCombox.setCurrentText("5")
+        self.filterTypelayout.addRow("kernel", self.filterSlider)
+        self.filterTypelayout.addRow("kernelSize", self.kernelSizeCombox)
         self.stackfilter.setLayout(self.filterTypelayout)
 
     def rawDemosicUI(self):
@@ -244,6 +256,7 @@ class UI_Image(QWidget):
             "funcType": self.leftlist.currentItem().text(),
             "namePath": self.srcImagePath,
             "typeCal": self.combox.currentText(),
+            "kernelSize" : self.kernelSizeCombox.currentText(),
         }
         str = self.process.imageprocess(imageInfo)
         # self.dstImageLab.setPixmap(QPixmap(str))
@@ -310,7 +323,7 @@ class UI_Image(QWidget):
             )
             if not self.srcImagePath.endswith(
                 ".raw"
-            ) and not not self.srcImagePath.endswith(".bin"):
+            ) and not self.srcImagePath.endswith(".bin"):
                 self.showImage(self.srcImageLab, self.srcImagePath)
 
     def setImagePorcess(self, imgprocess):
