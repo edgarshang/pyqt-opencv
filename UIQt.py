@@ -99,9 +99,7 @@ class UI_Image(QWidget):
     def GromTransFormUI(self, uiLayout):
         self.gromTransFormLayout = QFormLayout()
         self.gromTransFormCombox = QComboBox()
-        self.gromTransFormCombox.addItems(
-            ["缩放","翻转","访射","旋转","透视","重映射"]
-        )
+        self.gromTransFormCombox.addItems(["缩放", "翻转", "访射", "旋转", "透视", "重映射"])
         self.gromTransFormLayout.addRow("tranType:", self.gromTransFormCombox)
         self.gromTransFormDxEdit = QLineEdit("1")
         self.gromTransFormDyEdit = QLineEdit("1")
@@ -110,9 +108,7 @@ class UI_Image(QWidget):
         self.gromTransFormLayout.addRow("fy:", self.gromTransFormDyEdit)
 
         self.gromTransCombox = QComboBox()
-        self.gromTransCombox.addItems(
-            ["0","1","-1"]
-        )
+        self.gromTransCombox.addItems(["0", "1", "-1"])
         self.gromTransCombox.setCurrentText("0")
         self.gromTransFormLayout.addRow("rotate:", self.gromTransCombox)
 
@@ -129,7 +125,6 @@ class UI_Image(QWidget):
         self.gromTransFormLayout.addRow("scale:", self.geomTransFormScale)
 
         uiLayout.setLayout(self.gromTransFormLayout)
-
 
     def ThresholdingUI(self):
         self.thresholdFormLayout = QFormLayout()
@@ -229,7 +224,7 @@ class UI_Image(QWidget):
         self.filterSlider.setValue(5)
         self.filterSlider.setTickPosition(QSlider.TicksBelow)
         self.filterSlider.setTickInterval(2)
-        self.kernelSizeCombox = QComboBox() 
+        self.kernelSizeCombox = QComboBox()
         self.kernelSizeCombox.addItems(["3", "5", "7", "9", "11", "13"])
         self.kernelSizeCombox.setCurrentText("5")
         self.filterTypelayout.addRow("kernel", self.filterSlider)
@@ -296,7 +291,7 @@ class UI_Image(QWidget):
             "funcType": self.leftlist.currentItem().text(),
             "namePath": self.srcImagePath,
             "typeCal": self.combox.currentText(),
-            "kernelSize" : self.kernelSizeCombox.currentText(),
+            "kernelSize": self.kernelSizeCombox.currentText(),
         }
         str = self.process.imageprocess(imageInfo)
         # self.dstImageLab.setPixmap(QPixmap(str))
@@ -329,17 +324,17 @@ class UI_Image(QWidget):
 
     def geomTransform(self):
         imageInfo = {
-           "funcType": self.leftlist.currentItem().text(),
-           "namePath": self.srcImagePath,
-           "typeCal" : "GeomTransform",
-           "typeGeom" : self.gromTransFormCombox.currentText(),
-           "geomDx" : self.gromTransFormDxEdit.text(),
-           "geomDy": self.gromTransFormDyEdit.text(),
-           "rotate": self.gromTransCombox.currentText(),
-           "gemoPanx":self.gromTransPanMoveX.text(),
-           "gemoPany":self.gromTransPanMoveY.text(),
-           "Angle": self.geomTransFormAngle.text(),
-           "Scale":self.geomTransFormScale.text(),
+            "funcType": self.leftlist.currentItem().text(),
+            "namePath": self.srcImagePath,
+            "typeCal": "GeomTransform",
+            "typeGeom": self.gromTransFormCombox.currentText(),
+            "geomDx": self.gromTransFormDxEdit.text(),
+            "geomDy": self.gromTransFormDyEdit.text(),
+            "rotate": self.gromTransCombox.currentText(),
+            "gemoPanx": self.gromTransPanMoveX.text(),
+            "gemoPany": self.gromTransPanMoveY.text(),
+            "Angle": self.geomTransFormAngle.text(),
+            "Scale": self.geomTransFormScale.text(),
         }
         str = self.process.imageprocess(imageInfo)
         self.showImage(self.dstImageLab, str)

@@ -52,7 +52,9 @@ class opencvImage(Process):
             return dstname
 
         elif burType == "2D":
-            kernel = np.ones((kernelSize, kernelSize), dtype=np.float32) / (kernelSize*kernelSize)
+            kernel = np.ones((kernelSize, kernelSize), dtype=np.float32) / (
+                kernelSize * kernelSize
+            )
             r = cv2.filter2D(o, -1, kernel)
             cv2.imwrite(dstname, r)
             return dstname
@@ -205,24 +207,32 @@ class opencvImage(Process):
         o = imread(srcNamePath)
         typeGeom = imageInfo["typeGeom"]
         if typeGeom == "缩放":
-            r = cv2.resize(o, None, fx=np.double(imageInfo["geomDx"]), fy=np.double(imageInfo["geomDy"]))
+            r = cv2.resize(
+                o,
+                None,
+                fx=np.double(imageInfo["geomDx"]),
+                fy=np.double(imageInfo["geomDy"]),
+            )
         elif typeGeom == "翻转":
             r = cv2.flip(o, int(imageInfo["rotate"]))
         elif typeGeom == "访射":
-            h,w = o.shape[:2]
-            M = np.float32([[1,0,int(imageInfo["gemoPanx"])],[0,1,int(imageInfo["gemoPany"])]])
-            r = cv2.warpAffine(o,M,(w,h))
+            h, w = o.shape[:2]
+            M = np.float32(
+                [[1, 0, int(imageInfo["gemoPanx"])], [0, 1, int(imageInfo["gemoPany"])]]
+            )
+            r = cv2.warpAffine(o, M, (w, h))
         elif typeGeom == "旋转":
-            h,w = o.shape[:2]
-            M = cv2.getRotationMatrix2D((w/2, h/2), int(imageInfo["Angle"]), np.double(imageInfo["Scale"]))
-            r = cv2.warpAffine(o, M, (w,h))
+            h, w = o.shape[:2]
+            M = cv2.getRotationMatrix2D(
+                (w / 2, h / 2), int(imageInfo["Angle"]), np.double(imageInfo["Scale"])
+            )
+            r = cv2.warpAffine(o, M, (w, h))
         elif typeGeom == "透视":
             pass
         elif typeGeom == "重映射":
             pass
         cv2.imwrite(dstname, r)
         return dstname
-
 
     def imageprocess(self, imageInfo):
         functionType = imageInfo["funcType"]
