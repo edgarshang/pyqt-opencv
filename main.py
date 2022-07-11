@@ -4,13 +4,16 @@ from PyQt5.QtWidgets import QApplication
 from UIQt import UI_Image
 from imageProcess import opencvImage
 
+import platform
+import os
+import PySide2
 
-# import os
-# import PySide2
-
-# dirname = os.path.dirname(PySide2.__file__)
-# plugin_path = os.path.join(dirname, "plugins", "platforms")
-# os.environ["QT_QPA_PLATFORM_PLUGIN_PATH"] = plugin_path
+if platform.system() == "Windows":
+    pass
+elif platform.system() == "Linux":
+    dirname = os.path.dirname(PySide2.__file__)
+    plugin_path = os.path.join(dirname, "plugins", "platforms")
+    os.environ["QT_QPA_PLATFORM_PLUGIN_PATH"] = plugin_path
 
 
 if __name__ == "__main__":
