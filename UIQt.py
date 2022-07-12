@@ -59,6 +59,12 @@ class UI_Image(QWidget):
         self.Stack.addWidget(self.stackGeomTrans)
         self.GromTransFormUI(self.stackGeomTrans)
 
+        self.morphology = QWidget()
+        self.Stack.addWidget(self.morphology)
+        self.MorphologyUI(self.morphology)
+
+        
+
         self.leftlist.currentRowChanged.connect(self.display)
 
         self.calButton = QPushButton("cal")
@@ -98,7 +104,11 @@ class UI_Image(QWidget):
         self.Stack.setCurrentIndex(i)
 
     def MorphologyUI(self, uilayout):
-        pass
+        self.morphologyFormLayout = QFormLayout()
+
+        self.lineddd = QLineEdit()
+        self.morphologyFormLayout.addRow("hello:", self.lineddd)
+        uilayout.setLayout(self.morphologyFormLayout)
 
     def GromTransFormUI(self, uiLayout):
         self.gromTransFormLayout = QFormLayout()
