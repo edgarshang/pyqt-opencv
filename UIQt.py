@@ -29,6 +29,7 @@ class UI_Image(QWidget):
         self.leftlist.insertItem(2, "Canny")
         self.leftlist.insertItem(3, "阈值处理")
         self.leftlist.insertItem(4, "几何变换")
+        self.leftlist.insertItem(5, "形态学操作")
 
         self.stacklayout = QHBoxLayout()
 
@@ -95,6 +96,9 @@ class UI_Image(QWidget):
 
     def display(self, i):
         self.Stack.setCurrentIndex(i)
+
+    def MorphologyUI(self, uilayout):
+        pass
 
     def GromTransFormUI(self, uiLayout):
         self.gromTransFormLayout = QFormLayout()
