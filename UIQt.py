@@ -63,8 +63,6 @@ class UI_Image(QWidget):
         self.Stack.addWidget(self.morphology)
         self.MorphologyUI(self.morphology)
 
-        
-
         self.leftlist.currentRowChanged.connect(self.display)
 
         self.calButton = QPushButton("cal")
@@ -75,6 +73,46 @@ class UI_Image(QWidget):
         self.vlayout.addWidget(self.calButton)
         self.vlayout.addStretch()
 
+        self.showTabWidget = QTabWidget()
+
+        self.showImageWidget = QWidget()
+        self.showTabWidget.addTab(self.showImageWidget, "image")
+        self.showImageWidgetUI(self.showImageWidget)
+
+        self.showHistogramWidget = QWidget()
+        self.showTabWidget.addTab(self.showHistogramWidget, "Histogram")
+        self.showHistogramWidgetUI(self.showHistogramWidget)
+
+        self.showMeanCurveWidget = QWidget()
+        self.showTabWidget.addTab(self.showMeanCurveWidget, "MeanCurve")
+        self.showMeanCurveWidgetUI(self.showMeanCurveWidget)
+
+        self.showTabLayout = QHBoxLayout()
+
+        self.showTabLayout.addWidget(self.showTabWidget)
+
+        self.hlayout = QHBoxLayout()
+        self.hlayout.addWidget(self.leftlist)
+        self.hlayout.addWidget(self.qstatckGroupBox)
+        self.hlayout.addLayout(self.vlayout)
+        self.hlayout.addStretch()
+        self.hlayout.addLayout(self.showTabLayout)
+        self.hlayout.addStretch()
+
+        self.setLayout(self.hlayout)
+
+    def display(self, i):
+        self.Stack.setCurrentIndex(i)
+
+    def showMeanCurveWidgetUI(self, uilayout):
+        pass
+
+    def showHistogramWidgetUI(self, uilayout):
+        pass
+
+    def showImageWidgetUI(self, uilayout):
+        self.imagelabLayout = QHBoxLayout()
+
         self.srcImageLab = QLabel()
         self.srcImageLab.setMinimumSize(320, 240)
         self.srcImageLab.setStyleSheet("QLabel{background-color:rgb(0,0,0)}")
@@ -83,25 +121,10 @@ class UI_Image(QWidget):
         self.dstImageLab.setMinimumSize(320, 240)
         self.dstImageLab.setStyleSheet("QLabel{background-color:rgb(0,0,0)}")
         self.dstImageLab.setScaledContents(True)
-
-        self.imagelabLayout = QHBoxLayout()
-        # self.imagelabLayout.addStretch()
         self.imagelabLayout.addWidget(self.srcImageLab)
         self.imagelabLayout.addWidget(self.dstImageLab)
-        # self.imagelabLayout.addStretch()
 
-        self.hlayout = QHBoxLayout()
-        self.hlayout.addWidget(self.leftlist)
-        self.hlayout.addWidget(self.qstatckGroupBox)
-        self.hlayout.addLayout(self.vlayout)
-        self.hlayout.addStretch()
-        self.hlayout.addLayout(self.imagelabLayout)
-        self.hlayout.addStretch()
-
-        self.setLayout(self.hlayout)
-
-    def display(self, i):
-        self.Stack.setCurrentIndex(i)
+        uilayout.setLayout(self.imagelabLayout)
 
     def MorphologyUI(self, uilayout):
         self.morphologyFormLayout = QFormLayout()
