@@ -419,7 +419,7 @@ class UI_Image(QWidget):
                 self,
                 "Open file",
                 QDir.currentPath(),
-                "Image files (*.jpg *.gif *.raw *.bin)",
+                "Image files (*.jpg *.gif *.png *.raw *.bin)",
             )
             if not self.srcImagePath.endswith(
                 ".raw"
