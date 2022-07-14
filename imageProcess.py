@@ -3,6 +3,7 @@ from Iimageprocess import Process
 import cv2
 import numpy as np
 import os
+from matplotlib import pyplot as plt
 
 
 class opencvImage(Process):
@@ -11,6 +12,14 @@ class opencvImage(Process):
     #     super(opencvImage, self).__init__(parent)
 
     # def imageprocess(self,str,type="None"):
+
+    def calHistogram(self, imagePath):
+        img = cv2.imread(imagePath)
+        color = ("b", "g", "r")
+        for i, col in enumerate(color):
+            histr = cv2.calcHist([img], [i], None, [256], [0, 256])
+            plt.plot(histr, color=col)
+            plt.xlim([0, 256])
 
     def burFunc(self, imageInfo):
         filePath, filename = os.path.split(imageInfo["namePath"])

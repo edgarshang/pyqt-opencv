@@ -108,7 +108,13 @@ class UI_Image(QWidget):
         pass
 
     def showHistogramWidgetUI(self, uilayout):
-        pass
+        self.showHistogramHlayout = QHBoxLayout()
+        self.showHistogramLabel = QLabel()
+        self.showHistogramLabel.setStyleSheet("QLabel{background-color:rgb(0,0,0)}")
+        self.showHistogramLabel.setScaledContents(True)
+        self.showHistogramHlayout.addWidget(self.showHistogramLabel)
+
+        uilayout.setLayout(self.showHistogramHlayout)
 
     def showImageWidgetUI(self, uilayout):
         self.imagelabLayout = QHBoxLayout()
