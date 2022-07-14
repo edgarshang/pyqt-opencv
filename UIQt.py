@@ -5,6 +5,7 @@ from PyQt5.QtCore import *
 from PyQt5.QtGui import *
 
 import sys
+from numpy import histogram
 
 from yaml import warnings
 from Iimageprocess import Process
@@ -348,8 +349,9 @@ class UI_Image(QWidget):
             "the1": self.CannythresholdEdit1.text(),
             "the2": self.CannythresholdEdit2.text(),
         }
-        str = self.process.imageprocess(imageInfo)
+        str, histogram_path= self.process.imageprocess(imageInfo)
         self.showImage(self.dstImageLab, str)
+        self.showImage(self.showHistogramLabel, histogram_path)
 
     def thresholdHandle(self):
         imageInfo = {
@@ -362,8 +364,9 @@ class UI_Image(QWidget):
             "thresAdmethod": self.thresStatusInfo["method"],
             "thresAdType": self.thresStatusInfo["thresholdType"],
         }
-        str = self.process.imageprocess(imageInfo)
+        str, histogram_path= self.process.imageprocess(imageInfo)
         self.showImage(self.dstImageLab, str)
+        self.showImage(self.showHistogramLabel, histogram_path)
 
     def geomTransform(self):
         imageInfo = {

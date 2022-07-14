@@ -20,6 +20,9 @@ class opencvImage(Process):
             histr = cv2.calcHist([img], [i], None, [256], [0, 256])
             plt.plot(histr, color=col)
             plt.xlim([0, 256])
+        histDstName = os.path.split(imagePath)[0] + "_histgrom.png"
+        plt.savefig(histDstName)
+        return histDstName
 
     def burFunc(self, imageInfo):
         filePath, filename = os.path.split(imageInfo["namePath"])
@@ -126,7 +129,7 @@ class opencvImage(Process):
         r = cv2.Canny(o, int(imageInfo["the1"]), int(imageInfo["the2"]))
         # r = cv2.Canny(o, 32, 128)
         cv2.imwrite(dstname, r)
-        return dstname
+        return dstname, self.calHistogram(srcNamePath)
 
     def thresFunc(self, imageInfo):
         filePath, filename = os.path.split(imageInfo["namePath"])
@@ -203,7 +206,7 @@ class opencvImage(Process):
             )
 
         cv2.imwrite(dstname, r)
-        return dstname
+        return dstname, self.calHistogram(srcNamePath)
 
     def geomtransFunc(self, imageInfo):
         filePath, filename = os.path.split(imageInfo["namePath"])
