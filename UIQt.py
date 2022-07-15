@@ -326,9 +326,10 @@ class UI_Image(QWidget):
                 "pattern": self.patternComBox.currentText(),
                 "blackLevel": self.blacklevelLineEdit.text(),
             }
-            str = self.process.imageprocess(imageInfo)
+            str, histogram_path = self.process.imageprocess(imageInfo)
             # self.dstImageLab.setPixmap(QPixmap(str))
             self.showImage(self.dstImageLab, str)
+            self.showImage(self.showHistogramLabel, histogram_path)
 
     def filterHandle(self):
         imageInfo = {
@@ -337,9 +338,10 @@ class UI_Image(QWidget):
             "typeCal": self.combox.currentText(),
             "kernelSize": self.kernelSizeCombox.currentText(),
         }
-        str = self.process.imageprocess(imageInfo)
+        str, histogram_path = self.process.imageprocess(imageInfo)
         # self.dstImageLab.setPixmap(QPixmap(str))
         self.showImage(self.dstImageLab, str)
+        self.showImage(self.showHistogramLabel, histogram_path)
 
     def cannyHandle(self):
         imageInfo = {
@@ -349,7 +351,7 @@ class UI_Image(QWidget):
             "the1": self.CannythresholdEdit1.text(),
             "the2": self.CannythresholdEdit2.text(),
         }
-        str, histogram_path= self.process.imageprocess(imageInfo)
+        str, histogram_path = self.process.imageprocess(imageInfo)
         self.showImage(self.dstImageLab, str)
         self.showImage(self.showHistogramLabel, histogram_path)
 
@@ -364,7 +366,7 @@ class UI_Image(QWidget):
             "thresAdmethod": self.thresStatusInfo["method"],
             "thresAdType": self.thresStatusInfo["thresholdType"],
         }
-        str, histogram_path= self.process.imageprocess(imageInfo)
+        str, histogram_path = self.process.imageprocess(imageInfo)
         self.showImage(self.dstImageLab, str)
         self.showImage(self.showHistogramLabel, histogram_path)
 
@@ -382,8 +384,9 @@ class UI_Image(QWidget):
             "Angle": self.geomTransFormAngle.text(),
             "Scale": self.geomTransFormScale.text(),
         }
-        str = self.process.imageprocess(imageInfo)
+        str, histogram_path = self.process.imageprocess(imageInfo)
         self.showImage(self.dstImageLab, str)
+        self.showImage(self.showHistogramLabel, histogram_path)
 
     def onRadioButtonToggled(self, btn):
         if btn.isChecked() == True:

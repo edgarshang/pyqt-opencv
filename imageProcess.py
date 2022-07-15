@@ -36,32 +36,27 @@ class opencvImage(Process):
         o = imread(srcNamePath)
 
         if burType == "None":
-            return srcNamePath
+            return srcNamePath, self.calHistogram(srcNamePath)
 
         elif burType == "mean":
             r = cv2.blur(o, (kernelSize, kernelSize))
             cv2.imwrite(dstname, r)
-            return dstname
 
         elif burType == "Gauss":
             r = cv2.GaussianBlur(o, (kernelSize, kernelSize), 0, 0)
             cv2.imwrite(dstname, r)
-            return dstname
 
         elif burType == "box":
             r = cv2.boxFilter(o, -1, (kernelSize, kernelSize))
             cv2.imwrite(dstname, r)
-            return dstname
 
         elif burType == "median":
             r = cv2.medianBlur(o, kernelSize)
             cv2.imwrite(dstname, r)
-            return dstname
 
         elif burType == "bil":
             r = cv2.bilateralFilter(o, 25, 100, 100)
             cv2.imwrite(dstname, r)
-            return dstname
 
         elif burType == "2D":
             kernel = np.ones((kernelSize, kernelSize), dtype=np.float32) / (
@@ -69,7 +64,7 @@ class opencvImage(Process):
             )
             r = cv2.filter2D(o, -1, kernel)
             cv2.imwrite(dstname, r)
-            return dstname
+        return dstname, self.calHistogram(srcNamePath)
 
     def demosicFunc(self, imageInfo):
         filePath, filename = os.path.split(imageInfo["namePath"])
@@ -114,7 +109,7 @@ class opencvImage(Process):
         self.bgrImage = (self.bgrImage * wbgain / 256) ** (1 / 2.2) * 255 // 1
 
         cv2.imwrite(dstname, self.bgrImage)
-        return dstname
+        return dstname, self.calHistogram(dstname)
 
     def cannyFunc(self, imageInfo):
         filePath, filename = os.path.split(imageInfo["namePath"])
@@ -244,7 +239,8 @@ class opencvImage(Process):
         elif typeGeom == "重映射":
             pass
         cv2.imwrite(dstname, r)
-        return dstname
+
+        return dstname, self.calHistogram(srcNamePath)
 
     def imageprocess(self, imageInfo):
         functionType = imageInfo["funcType"]
