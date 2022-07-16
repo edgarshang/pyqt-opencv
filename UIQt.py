@@ -136,8 +136,16 @@ class UI_Image(QWidget):
     def MorphologyUI(self, uilayout):
         self.morphologyFormLayout = QFormLayout()
 
-        self.lineddd = QLineEdit()
-        self.morphologyFormLayout.addRow("hello:", self.lineddd)
+        self.MorphologyCombox = QComboBox()
+        self.MorphologyCombox.addItems(["腐蚀", "膨胀", "开运算", "闭运算", "礼帽运算", "黑帽运算"])
+        self.morphologyFormLayout.addRow("MorphType:", self.MorphologyCombox)
+        self.MorphologyKernelCombox = QComboBox()
+        self.MorphologyKernelCombox.addItems(["3", "5", "7", "9", "11", "13"])
+        self.morphologyFormLayout.addRow("Kernel:", self.MorphologyKernelCombox)
+        self.MorphologyCountSpinBox = QSpinBox()
+        self.MorphologyCountSpinBox.setMaximum(3)
+        self.morphologyFormLayout.addRow("Count:", self.MorphologyCountSpinBox)
+
         uilayout.setLayout(self.morphologyFormLayout)
 
     def GromTransFormUI(self, uiLayout):
@@ -370,7 +378,7 @@ class UI_Image(QWidget):
         self.showImage(self.dstImageLab, str)
         self.showImage(self.showHistogramLabel, histogram_path)
 
-    def geomTransform(self):
+    def geomTransformHandle(self):
         imageInfo = {
             "funcType": self.leftlist.currentItem().text(),
             "namePath": self.srcImagePath,
@@ -387,6 +395,22 @@ class UI_Image(QWidget):
         str, histogram_path = self.process.imageprocess(imageInfo)
         self.showImage(self.dstImageLab, str)
         self.showImage(self.showHistogramLabel, histogram_path)
+    
+    def MorphologyHandle(self):
+        imageInfo = {
+            "funcType": self.leftlist.currentItem().text(),
+            "namePath": self.srcImagePath,
+            "typeCal": "Morphology",
+            "typeMorph": self.MorphologyCombox.currentText(),
+            "KernelMor": self.MorphologyKernelCombox.currentText(),
+            "countMor":self.MorphologyCountSpinBox.text(),
+        }
+
+        str, histogram_path = self.process.imageprocess(imageInfo)
+        self.showImage(self.dstImageLab, str)
+        self.showImage(self.showHistogramLabel, histogram_path)
+        print("hell")
+
 
     def onRadioButtonToggled(self, btn):
         if btn.isChecked() == True:
@@ -413,7 +437,9 @@ class UI_Image(QWidget):
                 elif self.leftlist.currentItem().text() == "阈值处理":
                     self.thresholdHandle()
                 elif self.leftlist.currentItem().text() == "几何变换":
-                    self.geomTransform()
+                    self.geomTransformHandle()
+                elif self.leftlist.currentItem().text() == "形态学操作":
+                    self.MorphologyHandle()
             else:
                 print("str is None")
 

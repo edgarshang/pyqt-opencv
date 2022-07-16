@@ -242,6 +242,36 @@ class opencvImage(Process):
 
         return dstname, self.calHistogram(srcNamePath)
 
+    def MorphologyFunc(self, imageInfo):
+        filePath, filename = os.path.split(imageInfo["namePath"])
+        srcNamePath = imageInfo["namePath"]
+        Type = imageInfo["typeCal"]
+        dstname, filetype = os.path.splitext(filename)
+        dstname += "_" + Type + filetype
+        dstname = os.path.join(filePath, dstname)
+        print(f"dstname = {dstname}, filetype = {filetype}")
+        o = imread(srcNamePath, cv2.IMREAD_UNCHANGED)
+        
+        typeMorphology = imageInfo["typeMorph"]
+        kernelSize = int(imageInfo["KernelMor"])
+        count = int(imageInfo["countMor"])
+        kernel = np.ones((kernelSize, kernelSize), np.uint8)
+        if typeMorphology == "腐蚀":
+            r = cv2.erode(o, kernel, iterations=count)
+        elif typeMorphology == "膨胀":
+            r = cv2.dilate(o, kernel, iterations=count)
+        elif typeMorphology == "开运算":
+            r = cv2.morphologyEx(o, cv2.MORPH_OPEN, kernel, iterations=count)
+        elif typeMorphology == "闭运算":
+            r = cv2.morphologyEx(o, cv2.MORPH_CLOSE, kernel, iterations=count)
+        elif typeMorphology == "礼帽运算":
+            r = cv2.morphologyEx(o, cv2.MORPH_TOPHAT, kernel, iterations=count)
+        elif typeMorphology == "黑帽运算":
+            r = cv2.morphologyEx(o, cv2.MORPH_BLACKHAT, kernel, iterations=count)
+        cv2.imwrite(dstname, r)
+        return dstname, self.calHistogram(srcNamePath)
+        
+
     def imageprocess(self, imageInfo):
         functionType = imageInfo["funcType"]
 
@@ -255,3 +285,5 @@ class opencvImage(Process):
             return self.thresFunc(imageInfo)
         elif functionType == "几何变换":
             return self.geomtransFunc(imageInfo)
+        elif functionType == "形态学操作":
+            return self.MorphologyFunc(imageInfo)
