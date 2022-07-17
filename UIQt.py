@@ -31,6 +31,22 @@ class UI_Image(QWidget):
         self.leftlist.insertItem(3, "阈值处理")
         self.leftlist.insertItem(4, "几何变换")
         self.leftlist.insertItem(5, "形态学操作")
+        self.leftlist.insertItem(6, "图像梯度")
+        self.leftlist.insertItem(7, "图像金字塔")
+        self.leftlist.insertItem(8, "图像轮廓")
+        self.leftlist.insertItem(9, "直方图处理")
+        self.leftlist.insertItem(10, "傅里叶变换")
+        self.leftlist.insertItem(11, "模板匹配")
+        self.leftlist.insertItem(12, "霍夫变换")
+        self.leftlist.insertItem(13, "图像分割与提取")
+        self.leftlist.insertItem(14, "视频处理")
+        self.leftlist.insertItem(15, "绘图及交互")
+        self.leftlist.insertItem(16, "K 近邻算法")
+        self.leftlist.insertItem(17, "支持向量机")
+        self.leftlist.insertItem(18, "K 均值聚类")
+        self.leftlist.insertItem(19, "人脸识别")
+
+
 
         self.stacklayout = QHBoxLayout()
 
@@ -63,6 +79,10 @@ class UI_Image(QWidget):
         self.morphology = QWidget()
         self.Stack.addWidget(self.morphology)
         self.MorphologyUI(self.morphology)
+
+        self.imageGradient = QWidget()
+        self.Stack.addWidget(self.imageGradient)
+        self.imageGradientUI(self.imageGradient)
 
         self.leftlist.currentRowChanged.connect(self.display)
 
@@ -106,6 +126,8 @@ class UI_Image(QWidget):
         self.Stack.setCurrentIndex(i)
 
     def showMeanCurveWidgetUI(self, uilayout):
+        pass
+    def imageGradientUI(self, uilayout):
         pass
 
     def showHistogramWidgetUI(self, uilayout):
