@@ -1,3 +1,4 @@
+import pstats
 from cv2 import imread
 from Iimageprocess import Process
 import cv2
@@ -296,11 +297,37 @@ class opencvImage(Process):
             r = cv2.convertScaleAbs(r)
         cv2.imwrite(dstname, r)
         return dstname, self.calHistogram(srcNamePath)
+
+    def imagePyramidFunc(self, imageInfo):
+        print("hello, world")
+        filePath, filename = os.path.split(imageInfo["namePath"])
+        srcNamePath = imageInfo["namePath"]
+        Type = imageInfo["typeCal"]
+        dstname, filetype = os.path.splitext(filename)
+        dstname += "_" + Type + filetype
+        dstname = os.path.join(filePath, dstname)
+        print(f"dstname = {dstname}, filetype = {filetype}")
+        o = imread(srcNamePath, cv2.IMREAD_GRAYSCALE)
+
+        typeImagePyramid = imageInfo["typePyramid"]
+        print(typeImagePyramid)
+        if typeImagePyramid == "高斯上采样":
+            r = cv2.pyrUp(o)
+        elif typeImagePyramid == "高斯下采样":
+            r = cv2.pyrDown(o)
+        elif typeImagePyramid == "拉普拉斯金字塔":
+            G0 = o
+            G1 = cv2.pyrDown(G0)
+            r = G0 - cv2.pyrUp(G1)
+        cv2.imwrite(dstname, r)
+        return dstname, self.calHistogram(srcNamePath)
+
         
         
 
     def imageprocess(self, imageInfo):
         functionType = imageInfo["funcType"]
+        print("In imageprocess...")
 
         if functionType == "Demosic":
             return self.demosicFunc(imageInfo)
@@ -316,3 +343,5 @@ class opencvImage(Process):
             return self.MorphologyFunc(imageInfo)
         elif functionType == "图像梯度":
             return self.imageGradientFunc(imageInfo)
+        elif functionType == "图像金字塔":
+            return self.imagePyramidFunc(imageInfo)

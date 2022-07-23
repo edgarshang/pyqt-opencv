@@ -84,6 +84,10 @@ class UI_Image(QWidget):
         self.Stack.addWidget(self.imageGradient)
         self.imageGradientUI(self.imageGradient)
 
+        self.imagePyramid = QWidget()
+        self.Stack.addWidget(self.imagePyramid)
+        self.imagePyramidUI(self.imagePyramid)
+
         self.leftlist.currentRowChanged.connect(self.display)
 
         self.calButton = QPushButton("cal")
@@ -152,6 +156,16 @@ class UI_Image(QWidget):
         self.imagelabLayout.addWidget(self.dstImageLab)
 
         uilayout.setLayout(self.imagelabLayout)
+
+    def imagePyramidUI(self, uilayout):
+        self.imagePyramidFormLayout = QFormLayout()
+        self.imagePyramidCombox = QComboBox()
+
+        self.imagePyramidCombox.addItems(["高斯上采样", "高斯下采样", "拉普拉斯金字塔"])
+        self.imagePyramidFormLayout.addRow("采样：", self.imagePyramidCombox)
+
+        uilayout.setLayout(self.imagePyramidFormLayout)
+
     def imageGradientUI(self, uilayout):
         self.imageGradientFormLayout = QFormLayout()
 
@@ -459,6 +473,17 @@ class UI_Image(QWidget):
         self.showImage(self.dstImageLab, str)
         self.showImage(self.showHistogramLabel, histogram_path)
 
+    def ImagePyramidHandle(self):
+        imageInfo = {
+            "funcType":self.leftlist.currentItem().text(),
+            "namePath":self.srcImagePath,
+            "typeCal":"ImagePyramid",
+            "typePyramid":self.imagePyramidCombox.currentText(),
+        }
+        str, histogram_path = self.process.imageprocess(imageInfo)
+        self.showImage(self.dstImageLab, str)
+        self.showImage(self.showHistogramLabel, histogram_path)
+
 
 
     def onRadioButtonToggled(self, btn):
@@ -491,6 +516,8 @@ class UI_Image(QWidget):
                     self.MorphologyHandle()
                 elif self.leftlist.currentItem().text() == "图像梯度":
                     self.ImageGradientHandle()
+                elif self.leftlist.currentItem().text() == "图像金字塔":
+                    self.ImagePyramidHandle()
             else:
                 print("str is None")
 
