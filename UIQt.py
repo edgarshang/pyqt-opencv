@@ -127,8 +127,6 @@ class UI_Image(QWidget):
 
     def showMeanCurveWidgetUI(self, uilayout):
         pass
-    def imageGradientUI(self, uilayout):
-        pass
 
     def showHistogramWidgetUI(self, uilayout):
         self.showHistogramHlayout = QHBoxLayout()
@@ -154,6 +152,21 @@ class UI_Image(QWidget):
         self.imagelabLayout.addWidget(self.dstImageLab)
 
         uilayout.setLayout(self.imagelabLayout)
+    def imageGradientUI(self, uilayout):
+        self.imageGradientFormLayout = QFormLayout()
+
+        self.imageGradientCombox = QComboBox()
+        self.imageGradientCombox.addItems(["Sobel", "Scharr", "Laplacian"])
+
+        self.imageGradientCheckBoxX = QCheckBox("x 方向")
+        self.imageGradientCheckBoxX.setChecked(True)
+        self.imageGradientCheckBoxY = QCheckBox("y 方向")
+
+        self.imageGradientFormLayout.addRow("算子:", self.imageGradientCombox)
+        self.imageGradientFormLayout.addRow("X:", self.imageGradientCheckBoxX)
+        self.imageGradientFormLayout.addRow("Y:", self.imageGradientCheckBoxY)
+
+        uilayout.setLayout(self.imageGradientFormLayout)
 
     def MorphologyUI(self, uilayout):
         self.morphologyFormLayout = QFormLayout()
@@ -431,7 +444,21 @@ class UI_Image(QWidget):
         str, histogram_path = self.process.imageprocess(imageInfo)
         self.showImage(self.dstImageLab, str)
         self.showImage(self.showHistogramLabel, histogram_path)
-        print("hell")
+        # print("hell")
+
+    def ImageGradientHandle(self):
+        imageInfo = {
+            "funcType" : self.leftlist.currentItem().text(),
+            "namePath" : self.srcImagePath,
+            "typeCal" : "ImageGradient",
+            "typeGrad" : self.imageGradientCombox.currentText(),
+            "X_DIR":self.imageGradientCheckBoxX.isChecked(),
+            "Y_DIR":self.imageGradientCheckBoxY.isChecked(),
+        }
+        str, histogram_path = self.process.imageprocess(imageInfo)
+        self.showImage(self.dstImageLab, str)
+        self.showImage(self.showHistogramLabel, histogram_path)
+
 
 
     def onRadioButtonToggled(self, btn):
@@ -462,6 +489,8 @@ class UI_Image(QWidget):
                     self.geomTransformHandle()
                 elif self.leftlist.currentItem().text() == "形态学操作":
                     self.MorphologyHandle()
+                elif self.leftlist.currentItem().text() == "图像梯度":
+                    self.ImageGradientHandle()
             else:
                 print("str is None")
 

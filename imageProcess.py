@@ -270,6 +270,33 @@ class opencvImage(Process):
             r = cv2.morphologyEx(o, cv2.MORPH_BLACKHAT, kernel, iterations=count)
         cv2.imwrite(dstname, r)
         return dstname, self.calHistogram(srcNamePath)
+
+    def imageGradientFunc(self, imageInfo):
+        filePath, filename = os.path.split(imageInfo["namePath"])
+        srcNamePath = imageInfo["namePath"]
+        Type = imageInfo["typeCal"]
+        dstname, filetype = os.path.splitext(filename)
+        dstname += "_" + Type + filetype
+        dstname = os.path.join(filePath, dstname)
+        print(f"dstname = {dstname}, filetype = {filetype}")
+        o = imread(srcNamePath, cv2.IMREAD_GRAYSCALE)
+
+        typeImageGrad = imageInfo["typeGrad"]
+        xGrid = 1 if imageInfo["X_DIR"] == True else 0
+        yGrid = 1 if imageInfo["Y_DIR"] == True else 0
+
+        if typeImageGrad == "Sobel":
+            r = cv2.Sobel(o, cv2.CV_64F, xGrid, yGrid)
+            r = cv2.convertScaleAbs(r)
+        elif typeImageGrad == "Scharr":
+            r = cv2.Scharr(o, cv2.CV_64F, xGrid, yGrid)
+            r = cv2.convertScaleAbs(r)
+        elif typeImageGrad == "Laplacian":
+            r = cv2.Laplacian(o, cv2.CV_64F)
+            r = cv2.convertScaleAbs(r)
+        cv2.imwrite(dstname, r)
+        return dstname, self.calHistogram(srcNamePath)
+        
         
 
     def imageprocess(self, imageInfo):
@@ -287,3 +314,5 @@ class opencvImage(Process):
             return self.geomtransFunc(imageInfo)
         elif functionType == "形态学操作":
             return self.MorphologyFunc(imageInfo)
+        elif functionType == "图像梯度":
+            return self.imageGradientFunc(imageInfo)
