@@ -487,8 +487,3 @@ class opencvImage(Process):
         elif functionType == "傅里叶变换":
             return self.imageFourTransFunc(imageInfo)
 
-        # "funcType":self.leftlist.currentItem().text(),
-        #     "namePath":self.srcImagePath,
-        #     "typeCal":"ImageHist",
-        #     "typeHist":self.imageHistCombox.currentText(),
-        #     "BinsHist" : self.imageHistBins.text(),
