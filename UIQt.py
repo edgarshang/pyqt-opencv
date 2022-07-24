@@ -92,6 +92,10 @@ class UI_Image(QWidget):
         self.Stack.addWidget(self.imageHist)
         self.imageHistUI(self.imageHist)
 
+        self.imageFourTrans = QWidget()
+        self.Stack.addWidget(self.imageFourTrans)
+        self.imageFourTransUI(self.imageFourTrans)
+
         self.leftlist.currentRowChanged.connect(self.display)
 
         self.calButton = QPushButton("cal")
@@ -160,6 +164,17 @@ class UI_Image(QWidget):
         self.imagelabLayout.addWidget(self.dstImageLab)
 
         uilayout.setLayout(self.imagelabLayout)
+
+    def imageFourTransUI(self, uilayout):
+        self.imageFourTransFormLayout = QFormLayout()
+        self.imageFourTransCombox = QComboBox()
+        self.imageFourTransCombox.addItems(["傅里叶变换", "逆傅里叶变换", "高通滤波", "低通滤波", "cv傅里叶变换", "cv逆傅里叶变换", "cv低通滤波"])
+        self.imageFourTransFormLayout.addRow("Type:", self.imageFourTransCombox)
+        self.imageFourTransLineEdit = QLineEdit("30")
+        self.imageFourTransFormLayout.addRow("frequency:", self.imageFourTransLineEdit)
+
+        uilayout.setLayout(self.imageFourTransFormLayout)
+        
 
     def imageHistUI(self, uilayout):
         self.imageHistFormLayout = QFormLayout()
@@ -513,6 +528,18 @@ class UI_Image(QWidget):
         self.showImage(self.dstImageLab, str)
         self.showImage(self.showHistogramLabel, histogram_path)
 
+    def imageFourTransHandle(self):
+        imageInfo = {
+            "funcType":self.leftlist.currentItem().text(),
+            "namePath":self.srcImagePath,
+            "typeCal":"ImageFourTrans",
+            "TypeFour":self.imageFourTransCombox.currentText(),
+            "FrequencySize":self.imageFourTransLineEdit.text(),
+        }
+        str, histogram_path = self.process.imageprocess(imageInfo)
+        self.showImage(self.dstImageLab, str)
+        self.showImage(self.showHistogramLabel, histogram_path)
+
 
 
 
@@ -550,6 +577,8 @@ class UI_Image(QWidget):
                     self.ImagePyramidHandle()
                 elif self.leftlist.currentItem().text() == "直方图处理":
                     self.ImageHistHandle()
+                elif self.leftlist.currentItem().text() == "傅里叶变换":
+                    self.imageFourTransHandle()
             else:
                 print("str is None")
 

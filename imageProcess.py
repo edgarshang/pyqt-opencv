@@ -5,7 +5,7 @@ from Iimageprocess import Process
 import cv2
 import numpy as np
 import os
-from matplotlib import pyplot as plt
+from matplotlib import cm, pyplot as plt
 
 
 class opencvImage(Process):
@@ -25,6 +25,7 @@ class opencvImage(Process):
             plt.xlim([0, 256])
         histDstName = os.path.split(imagePath)[0] + "_histgrom.png"
         plt.savefig(histDstName)
+        plt.cla()
         return histDstName
 
     def burFunc(self, imageInfo):
@@ -353,6 +354,109 @@ class opencvImage(Process):
             r = cv2.equalizeHist(o)
             cv2.imwrite(dstname, r)
         return dstname, self.calHistogram(srcNamePath)
+
+    def imageFourTransFunc(self, imageInfo):
+        filePath, filename = os.path.split(imageInfo["namePath"])
+        srcNamePath = imageInfo["namePath"]
+        Type = imageInfo["typeCal"]
+        dstname, filetype = os.path.splitext(filename)
+        dstname += "_" + Type + filetype
+        dstname = os.path.join(filePath, dstname)
+        print(f"dstname = {dstname}, filetype = {filetype}")
+        o = imread(srcNamePath, 0)
+        
+        TypeFourTrans = imageInfo["TypeFour"]
+        Size = int(imageInfo["FrequencySize"])
+
+        if TypeFourTrans == "傅里叶变换":
+            f = np.fft.fft2(o)
+            fshift = np.fft.fftshift(f)
+            magnitude_spectrum = 20*np.log(np.abs(fshift))
+            plt.subplot(121)
+            plt.imshow(o, cmap='gray')
+            plt.title('original')
+            plt.axis('off')
+            plt.subplot(122)
+            plt.imshow(magnitude_spectrum, cmap='gray')
+            plt.title('result')
+            plt.axis('off')
+            plt.savefig(dstname)
+            plt.cla()
+        elif TypeFourTrans == "逆傅里叶变换":
+            f = np.fft.fft2(o)
+            fshift = np.fft.fftshift(f)
+            ifshift = np.fft.ifftshift(fshift)
+            iimg = np.fft.ifft2(ifshift)
+            iimg = np.abs(iimg)
+            plt.subplot(121),plt.imshow(o, cmap='gray')
+            plt.title('original'),plt.axis('off')
+            plt.subplot(122), plt.imshow(iimg, cmap='gray')
+            plt.title('iimg'), plt.axis('off')
+            plt.savefig(dstname)
+            plt.cla()
+        elif TypeFourTrans == "高通滤波":
+            f = np.fft.fft2(o)
+            fshift = np.fft.fftshift(f)
+            rows, cols = o.shape
+            crow, ccol = int(rows/2), int(cols/2)
+            fshift[crow - Size : crow + Size, ccol - Size : ccol + Size] = 0
+            ishift = np.fft.ifftshift(fshift)
+            iimg = np.fft.ifft2(ishift)
+            iimg = np.abs(iimg)
+            cv2.imwrite(dstname, iimg)
+        elif TypeFourTrans == "低通滤波":
+            f = np.fft.fft2(o)
+            fshift = np.fft.fftshift(f)
+            rows, cols = o.shape
+            crow, ccol = int(rows/2), int(cols/2)
+            mask = np.zeros((rows, cols), np.uint8)
+            mask[crow - Size : crow + Size, ccol - Size : ccol + Size] = 1
+            ifshift = fshift * mask
+            iifshift = np.fft.ifftshift(ifshift)
+            iimg = np.fft.ifft2(iifshift)
+            iimg = np.abs(iimg)
+            cv2.imwrite(dstname, iimg)
+        elif TypeFourTrans == "cv傅里叶变换":
+            dft = cv2.dft(np.float32(o), flags=cv2.DFT_COMPLEX_OUTPUT)
+            dftShift = np.fft.fftshift(dft)
+            result = 20*np.log(cv2.magnitude(dftShift[:,:,0], dftShift[:,:,1]))
+            plt.subplot(121), plt.imshow(o, cmap='gray')
+            plt.title('original'),plt.axis('off')
+            plt.subplot(122),plt.imshow(result, cmap='gray')
+            plt.title('result'), plt.axis('off')
+            plt.savefig(dstname)
+            plt.cla()
+        elif TypeFourTrans == "cv逆傅里叶变换":
+            dft = cv2.dft(np.float32(o), flags=cv2.DFT_COMPLEX_OUTPUT)
+            dftShift = np.fft.fftshift(dft)
+            ishift = np.fft.ifftshift(dftShift)
+            iImg = cv2.idft(ishift)
+            # iImg = cv2.magnitude(iImg[:,:,0], iImg[:,;,1])
+            iImg = cv2.magnitude(iImg[:,:,0], iImg[:,:,1])
+            plt.subplot(121), plt.imshow(o, cmap='gray')
+            plt.title('original'), plt.axis('off')
+            plt.subplot(122), plt.imshow(iImg, cmap='gray')
+            plt.title('inverse'), plt.axis('off')
+            plt.savefig(dstname)
+            plt.cla()
+        elif TypeFourTrans == "cv低通滤波":
+            dft = cv2.dft(np.float32(o), flags=cv2.DFT_COMPLEX_OUTPUT)
+            dftShift = np.fft.fftshift(dft)
+            rows, cols = o.shape
+            crow, ccol = int(rows/2), int(cols/2)
+            mask = np.zeros((rows, cols, 2), np.uint8)
+            mask[crow-Size:crow+Size, ccol-Size:ccol+Size] = 1
+            fShift = dftShift*mask
+            ishift = np.fft.ifftshift(fShift)
+            iImg = cv2.idft(ishift)
+            iImg = cv2.magnitude(iImg[:,:,0], iImg[:,:,1])
+            plt.subplot(121), plt.imshow(o, cmap='gray')
+            plt.title('original'), plt.axis('off')
+            plt.subplot(122), plt.imshow(iImg, cmap='gray')
+            plt.title('invers'), plt.axis('off')
+            plt.savefig(dstname)
+            plt.cla()
+        return dstname, self.calHistogram(srcNamePath)
         
 
         
@@ -380,6 +484,8 @@ class opencvImage(Process):
             return self.imagePyramidFunc(imageInfo)
         elif functionType == "直方图处理":
             return self.imageHistFunc(imageInfo)
+        elif functionType == "傅里叶变换":
+            return self.imageFourTransFunc(imageInfo)
 
         # "funcType":self.leftlist.currentItem().text(),
         #     "namePath":self.srcImagePath,
