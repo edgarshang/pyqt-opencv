@@ -1,3 +1,4 @@
+from genericpath import exists
 import pstats
 from cv2 import imread
 from Iimageprocess import Process
@@ -13,6 +14,7 @@ class opencvImage(Process):
     #     super(opencvImage, self).__init__(parent)
 
     # def imageprocess(self,str,type="None"):
+
 
     def calHistogram(self, imagePath):
         img = cv2.imread(imagePath)
@@ -299,7 +301,6 @@ class opencvImage(Process):
         return dstname, self.calHistogram(srcNamePath)
 
     def imagePyramidFunc(self, imageInfo):
-        print("hello, world")
         filePath, filename = os.path.split(imageInfo["namePath"])
         srcNamePath = imageInfo["namePath"]
         Type = imageInfo["typeCal"]
@@ -321,6 +322,38 @@ class opencvImage(Process):
             r = G0 - cv2.pyrUp(G1)
         cv2.imwrite(dstname, r)
         return dstname, self.calHistogram(srcNamePath)
+
+    def imageHistFunc(self, imageInfo):
+        filePath, filename = os.path.split(imageInfo["namePath"])
+        srcNamePath = imageInfo["namePath"]
+        Type = imageInfo["typeCal"]
+        dstname, filetype = os.path.splitext(filename)
+        dstname += "_" + Type + filetype
+        dstname = os.path.join(filePath, dstname)
+        print(f"dstname = {dstname}, filetype = {filetype}")
+        o = imread(srcNamePath)
+
+        typeImageHist = imageInfo["typeHist"]
+        binsHist = int(imageInfo["BinsHist"])
+
+        if typeImageHist == "numpy":
+            plt.hist(o.ravel(), binsHist)
+            if os.path.exists(dstname):
+                os.remove(dstname)
+            plt.savefig(dstname)
+        elif typeImageHist == "CV2":
+            histb = cv2.calcHist([o], [0],None, [binsHist], [0,256])
+            plt.plot(histb, "b")
+            plt.xlim([0, 256])
+
+            # plt.plot(histb,'b')
+            plt.savefig(dstname)
+        elif "直方图均衡" == typeImageHist:
+            o = imread(srcNamePath,cv2.IMREAD_GRAYSCALE)
+            r = cv2.equalizeHist(o)
+            cv2.imwrite(dstname, r)
+        return dstname, self.calHistogram(srcNamePath)
+        
 
         
         
@@ -345,3 +378,11 @@ class opencvImage(Process):
             return self.imageGradientFunc(imageInfo)
         elif functionType == "图像金字塔":
             return self.imagePyramidFunc(imageInfo)
+        elif functionType == "直方图处理":
+            return self.imageHistFunc(imageInfo)
+
+        # "funcType":self.leftlist.currentItem().text(),
+        #     "namePath":self.srcImagePath,
+        #     "typeCal":"ImageHist",
+        #     "typeHist":self.imageHistCombox.currentText(),
+        #     "BinsHist" : self.imageHistBins.text(),

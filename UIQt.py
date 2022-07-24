@@ -88,6 +88,10 @@ class UI_Image(QWidget):
         self.Stack.addWidget(self.imagePyramid)
         self.imagePyramidUI(self.imagePyramid)
 
+        self.imageHist = QWidget()
+        self.Stack.addWidget(self.imageHist)
+        self.imageHistUI(self.imageHist)
+
         self.leftlist.currentRowChanged.connect(self.display)
 
         self.calButton = QPushButton("cal")
@@ -156,6 +160,18 @@ class UI_Image(QWidget):
         self.imagelabLayout.addWidget(self.dstImageLab)
 
         uilayout.setLayout(self.imagelabLayout)
+
+    def imageHistUI(self, uilayout):
+        self.imageHistFormLayout = QFormLayout()
+        self.imageHistCombox = QComboBox()
+
+        self.imageHistCombox.addItems(["numpy", "CV2", "直方图均衡"])
+        self.imageHistFormLayout.addRow("TypeHis:", self.imageHistCombox)
+
+        self.imageHistBins = QLineEdit("256")
+        self.imageHistFormLayout.addRow("Bins:", self.imageHistBins)
+        uilayout.setLayout(self.imageHistFormLayout)
+
 
     def imagePyramidUI(self, uilayout):
         self.imagePyramidFormLayout = QFormLayout()
@@ -484,6 +500,20 @@ class UI_Image(QWidget):
         self.showImage(self.dstImageLab, str)
         self.showImage(self.showHistogramLabel, histogram_path)
 
+    def ImageHistHandle(self):
+        imageInfo = {
+            "funcType":self.leftlist.currentItem().text(),
+            "namePath":self.srcImagePath,
+            "typeCal":"ImageHist",
+            "typeHist":self.imageHistCombox.currentText(),
+            "BinsHist" : self.imageHistBins.text(),
+        }
+
+        str, histogram_path = self.process.imageprocess(imageInfo)
+        self.showImage(self.dstImageLab, str)
+        self.showImage(self.showHistogramLabel, histogram_path)
+
+
 
 
     def onRadioButtonToggled(self, btn):
@@ -518,6 +548,8 @@ class UI_Image(QWidget):
                     self.ImageGradientHandle()
                 elif self.leftlist.currentItem().text() == "图像金字塔":
                     self.ImagePyramidHandle()
+                elif self.leftlist.currentItem().text() == "直方图处理":
+                    self.ImageHistHandle()
             else:
                 print("str is None")
 
