@@ -1,0 +1,6 @@
+matplotlib==3.5.1
+numpy==1.20.3
+opencv_contrib_python==4.5.5.62
+PyQt5==5.15.7
+PySide2==5.15.2.1
+PyYAML==6.0
