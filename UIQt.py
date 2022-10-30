@@ -35,7 +35,7 @@ class UI_Image(QWidget):
         self.leftlist.insertItem(7, "图像金字塔")
         self.leftlist.insertItem(8, "直方图处理")
         self.leftlist.insertItem(9, "傅里叶变换")
-        self.leftlist.insertItem(10, "模板匹配")
+        self.leftlist.insertItem(10, "图像拼接")
         self.leftlist.insertItem(11, "人脸识别")
         self.leftlist.insertItem(12, "霍夫变换")
         self.leftlist.insertItem(13, "图像分割与提取")
@@ -45,6 +45,7 @@ class UI_Image(QWidget):
         self.leftlist.insertItem(17, "支持向量机")
         self.leftlist.insertItem(18, "K 均值聚类")
         self.leftlist.insertItem(19, "图像轮廓")
+        self.leftlist.insertItem(20, "模板匹配")
 
 
 
@@ -96,6 +97,10 @@ class UI_Image(QWidget):
         self.Stack.addWidget(self.imageFourTrans)
         self.imageFourTransUI(self.imageFourTrans)
 
+        self.imageStitching = QWidget()
+        self.Stack.addWidget(self.imageStitching)
+        self.imageStitchingUI(self.imageStitching)
+
         self.leftlist.currentRowChanged.connect(self.display)
 
         self.calButton = QPushButton("cal")
@@ -120,6 +125,10 @@ class UI_Image(QWidget):
         self.showTabWidget.addTab(self.showMeanCurveWidget, "MeanCurve")
         self.showMeanCurveWidgetUI(self.showMeanCurveWidget)
 
+        self.showstitchWidget = QWidget()
+        self.showTabWidget.addTab(self.showstitchWidget, "stitchResult")
+        self.showstitchWidgetUI(self.showMeanCurveWidget)
+
         self.showTabLayout = QHBoxLayout()
 
         self.showTabLayout.addWidget(self.showTabWidget)
@@ -138,6 +147,9 @@ class UI_Image(QWidget):
         self.Stack.setCurrentIndex(i)
 
     def showMeanCurveWidgetUI(self, uilayout):
+        pass
+
+    def showstitchWidgetUI(self, uilayout):
         pass
 
     def showHistogramWidgetUI(self, uilayout):
@@ -164,6 +176,35 @@ class UI_Image(QWidget):
         self.imagelabLayout.addWidget(self.dstImageLab)
 
         uilayout.setLayout(self.imagelabLayout)
+    
+    def imageStitchingUI(self, uilayout):
+        hlayout = QVBoxLayout()
+        groupbox = QGroupBox("algoType")
+        siftradioButton = QRadioButton("SIFT")
+        orbradioButton = QRadioButton("ORB")
+        brisktradioButton = QRadioButton("BRISK")
+        modelradioButton = QRadioButton("MODEL")
+        modelradioButton.setCheckable(False)
+        hlayout.addWidget(siftradioButton)
+        hlayout.addWidget(orbradioButton)
+        hlayout.addWidget(brisktradioButton)
+        hlayout.addWidget(modelradioButton)
+        groupbox.setLayout(hlayout)
+
+        keyPointCheckoutBox = QCheckBox("关键点显示")
+        imageStitchCheckoutBox = QCheckBox("拼接")
+        saveStitchCheckoutBox = QCheckBox("保存")
+
+
+        hlayoutStitch = QVBoxLayout()
+        hlayoutStitch.addWidget(groupbox)
+        hlayoutStitch.addWidget(keyPointCheckoutBox)
+        hlayoutStitch.addWidget(imageStitchCheckoutBox)
+        hlayoutStitch.addWidget(saveStitchCheckoutBox)
+        # 
+
+        uilayout.setLayout(hlayoutStitch)
+
 
     def imageFourTransUI(self, uilayout):
         self.imageFourTransFormLayout = QFormLayout()
