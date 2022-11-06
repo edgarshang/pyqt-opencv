@@ -7,6 +7,15 @@ import numpy as np
 import os
 from matplotlib import cm, pyplot as plt
 
+import logging as log
+
+import testAlgo
+
+# 设置⽇志等级和输出⽇志格式
+log.basicConfig(level=log.DEBUG,
+format='%(asctime)s - %(filename)s[line:%(lineno)d] - %(levelname)s: %(message)s')
+log.debug('这是⼀个debug级别的⽇志信息')
+
 
 class opencvImage(Process):
 
@@ -457,6 +466,44 @@ class opencvImage(Process):
             plt.savefig(dstname)
             plt.cla()
         return dstname, self.calHistogram(srcNamePath)
+
+    def imageStitchFunc(self, imageInfo):
+        log.debug("this is imageStitchFunc")
+        leftfilePath, leftfilename = os.path.split(imageInfo["leftnamePath"])
+        rightfilePath, rightfilename = os.path.split(imageInfo["rightnamePath"])
+        leftsrcNamePath = imageInfo["leftnamePath"]
+        rightsrcNamePath = imageInfo["rightnamePath"]
+        Type = imageInfo["typeCal"]
+        leftdstname, leftfiletype = os.path.splitext(leftfilename)
+        rightdstname, rightfiletype = os.path.splitext(rightfilename)
+
+        leftdstname += "_" + Type + leftfiletype
+        rightdstname += "_" + Type + rightfiletype
+
+        dstleftdstname = os.path.join(leftfilePath, leftdstname)
+        dstrightdstname = os.path.join(rightfilePath, rightdstname)
+
+
+        if imageInfo["algoType"] == "SIFT":
+            log.debug("sift...")
+            dstleft = testAlgo.SIFT(leftsrcNamePath)
+            dstright = testAlgo.SIFT(rightsrcNamePath)
+        elif imageInfo["algoType"] == "ORB":
+            log.debug("orb...")
+            dstleft = testAlgo.ORB(leftsrcNamePath)
+            dstright = testAlgo.ORB(rightsrcNamePath)
+        elif imageInfo["algoType"] == "BRISK":
+            log.debug("brisk...")
+            dstleft = testAlgo.BRISK(leftsrcNamePath)
+            dstright = testAlgo.BRISK(rightsrcNamePath)
+
+        cv2.imwrite(dstleftdstname, dstleft)
+        cv2.imwrite(dstrightdstname, dstright)
+
+        return dstleftdstname, dstrightdstname
+
+        
+        
         
 
         
@@ -464,7 +511,7 @@ class opencvImage(Process):
 
     def imageprocess(self, imageInfo):
         functionType = imageInfo["funcType"]
-        print("In imageprocess...")
+        log.debug("In imageprocess...")
 
         if functionType == "Demosic":
             return self.demosicFunc(imageInfo)
@@ -486,4 +533,6 @@ class opencvImage(Process):
             return self.imageHistFunc(imageInfo)
         elif functionType == "傅里叶变换":
             return self.imageFourTransFunc(imageInfo)
+        elif functionType == "图像拼接":
+            return self.imageStitchFunc(imageInfo)
 

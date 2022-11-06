@@ -1,4 +1,4 @@
-from logging import warning
+import logging as log
 import this
 from PyQt5.QtWidgets import *
 from PyQt5.QtCore import *
@@ -9,6 +9,12 @@ from numpy import histogram
 
 from yaml import warnings
 from Iimageprocess import Process
+
+# 设置⽇志等级和输出⽇志格式
+log.basicConfig(level=log.DEBUG,
+format='%(asctime)s - %(filename)s[line:%(lineno)d] - %(levelname)s: %(message)s')
+log.debug('这是⼀个debug级别的⽇志信息')
+
 
 
 class UI_Image(QWidget):
@@ -23,6 +29,9 @@ class UI_Image(QWidget):
         self.setWindowTitle("PyQt OpenCV")
         self.openButton = QPushButton("OpenFile")
         self.openButton.clicked.connect(lambda: self.onButtonClick(self.openButton))
+
+        self.chooseFilesButton = QPushButton("ChooseFiles...")
+        self.chooseFilesButton.clicked.connect(lambda: self.onButtonClick(self.chooseFilesButton))
 
         self.leftlist = QListWidget()
         self.leftlist.insertItem(0, "滤波")
@@ -109,6 +118,7 @@ class UI_Image(QWidget):
         self.vlayout = QVBoxLayout()
         self.vlayout.addWidget(self.openButton)
         self.vlayout.addWidget(self.calButton)
+        self.vlayout.addWidget(self.chooseFilesButton)
         self.vlayout.addStretch()
 
         self.showTabWidget = QTabWidget()
@@ -191,16 +201,31 @@ class UI_Image(QWidget):
         hlayout.addWidget(modelradioButton)
         groupbox.setLayout(hlayout)
 
-        keyPointCheckoutBox = QCheckBox("关键点显示")
-        imageStitchCheckoutBox = QCheckBox("拼接")
-        saveStitchCheckoutBox = QCheckBox("保存")
+        siftradioButton.toggled.connect(
+            lambda: self.onRadioButtonToggled(siftradioButton)
+        )
+        
 
+        orbradioButton.toggled.connect(
+            lambda: self.onRadioButtonToggled(orbradioButton)
+        )
+
+        brisktradioButton.toggled.connect(
+            lambda: self.onRadioButtonToggled(brisktradioButton)
+        )
+
+        self.keyPointCheckoutBox = QCheckBox("关键点显示")
+        self.imageStitchCheckoutBox = QCheckBox("拼接")
+        self.saveStitchCheckoutBox = QCheckBox("保存")
+
+        self.stitchInfo = {"Algo": "SIFT"}
+        siftradioButton.setChecked(True)
 
         hlayoutStitch = QVBoxLayout()
         hlayoutStitch.addWidget(groupbox)
-        hlayoutStitch.addWidget(keyPointCheckoutBox)
-        hlayoutStitch.addWidget(imageStitchCheckoutBox)
-        hlayoutStitch.addWidget(saveStitchCheckoutBox)
+        hlayoutStitch.addWidget(self.keyPointCheckoutBox)
+        hlayoutStitch.addWidget(self.imageStitchCheckoutBox)
+        hlayoutStitch.addWidget(self.saveStitchCheckoutBox)
         # 
 
         uilayout.setLayout(hlayoutStitch)
@@ -581,6 +606,19 @@ class UI_Image(QWidget):
         self.showImage(self.dstImageLab, str)
         self.showImage(self.showHistogramLabel, histogram_path)
 
+    def imageStitchHandle(self):
+        imageInfo = {
+            "funcType":self.leftlist.currentItem().text(),
+            "leftnamePath":self.srcImagePaths[0],
+            "rightnamePath":self.srcImagePaths[1],
+            "typeCal":"ImageStitch",
+            "algoType":self.stitchInfo["Algo"],
+        }
+        left, right = self.process.imageprocess(imageInfo)
+        self.showImage(self.srcImageLab, left)
+        self.showImage(self.dstImageLab, right)
+        log.debug("this is imageStitchHandle")
+
 
 
 
@@ -595,11 +633,20 @@ class UI_Image(QWidget):
                 self.thresStatusInfo["thresholdType"] = "BINARY_INV"
             elif btn.text() == "BINARY":
                 self.thresStatusInfo["thresholdType"] = "BINARY"
+            elif btn.text() == "SIFT":
+                log.debug("sift")
+                self.stitchInfo["Algo"] = "SIFT"
+            elif btn.text() == "BRISK":
+                log.debug("brisk")
+                self.stitchInfo["Algo"] = "BRISK"
+            elif btn.text() == "ORB":
+                log.debug("orb")
+                self.stitchInfo["Algo"] = "ORB"
 
     def onButtonClick(self, btn):
         if btn.text() == "cal":
             print(self.leftlist.currentItem().text())
-            if len(self.srcImagePath.strip()) > 0:
+            if len(self.srcImagePath.strip()) > 0 or len(self.srcImagePaths) == 2:
                 if self.leftlist.currentItem().text() == "Demosic":
                     self.DemosicHandle()
                 elif self.leftlist.currentItem().text() == "滤波":
@@ -620,8 +667,10 @@ class UI_Image(QWidget):
                     self.ImageHistHandle()
                 elif self.leftlist.currentItem().text() == "傅里叶变换":
                     self.imageFourTransHandle()
+                elif self.leftlist.currentItem().text() == "图像拼接":
+                    self.imageStitchHandle()
             else:
-                print("str is None")
+                log.error("str is None")
 
         if btn.text() == "OpenFile":
             self.srcImagePath, _ = QFileDialog.getOpenFileName(
@@ -634,6 +683,18 @@ class UI_Image(QWidget):
                 ".raw"
             ) and not self.srcImagePath.endswith(".bin"):
                 self.showImage(self.srcImageLab, self.srcImagePath)
+
+        if btn.text()  == "ChooseFiles...":
+            self.srcImagePaths, _ = QFileDialog.getOpenFileNames(
+                self,
+                "Open files",
+                QDir.currentPath(),
+                "Image files (*.jpg *.gif *.png)",
+            )
+            if len(self.srcImagePaths) == 2:
+                self.showImage(self.srcImageLab, self.srcImagePaths[0])
+                self.showImage(self.dstImageLab, self.srcImagePaths[1])
+
 
     def setImagePorcess(self, imgprocess):
         self.process = imgprocess
