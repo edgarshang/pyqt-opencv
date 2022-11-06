@@ -466,22 +466,25 @@ class opencvImage(Process):
             plt.savefig(dstname)
             plt.cla()
         return dstname, self.calHistogram(srcNamePath)
+    
+    def pathMaker(self, path, nametype) -> str:
+        filePath, filename = os.path.split(path)
+        dstname, filetype = os.path.splitext(filename)
+        dstname += "_" + nametype + filetype
+        dstname = os.path.join(filePath, dstname)
+
+        return dstname
+
 
     def imageStitchFunc(self, imageInfo):
         log.debug("this is imageStitchFunc")
-        leftfilePath, leftfilename = os.path.split(imageInfo["leftnamePath"])
-        rightfilePath, rightfilename = os.path.split(imageInfo["rightnamePath"])
+
+        dstleftdstname = self.pathMaker(imageInfo["leftnamePath"], imageInfo["typeCal"])
+        dstrightdstname = self.pathMaker(imageInfo["rightnamePath"], imageInfo["typeCal"])
+
         leftsrcNamePath = imageInfo["leftnamePath"]
         rightsrcNamePath = imageInfo["rightnamePath"]
-        Type = imageInfo["typeCal"]
-        leftdstname, leftfiletype = os.path.splitext(leftfilename)
-        rightdstname, rightfiletype = os.path.splitext(rightfilename)
 
-        leftdstname += "_" + Type + leftfiletype
-        rightdstname += "_" + Type + rightfiletype
-
-        dstleftdstname = os.path.join(leftfilePath, leftdstname)
-        dstrightdstname = os.path.join(rightfilePath, rightdstname)
 
 
         if imageInfo["algoType"] == "SIFT":
