@@ -636,29 +636,7 @@ class UI_Image(QWidget):
             if len(self.srcImagePath.strip()) > 0 or len(self.srcImagePaths) == 2:
                 if self.leftlist.currentItem().text() == "YOLOv5":
                     log.info("this is the yolov5 test")
-                    yolov5_test()
-                elif self.leftlist.currentItem().text() == "Demosic":
-                    self.DemosicHandle()
-                elif self.leftlist.currentItem().text() == "滤波":
-                    self.filterHandle()
-                elif self.leftlist.currentItem().text() == "Canny":
-                    self.cannyHandle()
-                elif self.leftlist.currentItem().text() == "阈值处理":
-                    self.thresholdHandle()
-                elif self.leftlist.currentItem().text() == "几何变换":
-                    self.geomTransformHandle()
-                elif self.leftlist.currentItem().text() == "形态学操作":
-                    self.MorphologyHandle()
-                elif self.leftlist.currentItem().text() == "图像梯度":
-                    self.ImageGradientHandle()
-                elif self.leftlist.currentItem().text() == "图像金字塔":
-                    self.ImagePyramidHandle()
-                elif self.leftlist.currentItem().text() == "直方图处理":
-                    self.ImageHistHandle()
-                elif self.leftlist.currentItem().text() == "傅里叶变换":
-                    self.imageFourTransHandle()
-                elif self.leftlist.currentItem().text() == "图像拼接":
-                    self.imageStitchHandle()
+                    yolov5_test(source=self.srcImagePath)
             else:
                 log.error("str is None")
 
