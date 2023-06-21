@@ -10,6 +10,9 @@ from numpy import histogram
 from yaml import warnings
 from Iimageprocess import Process
 
+from yolov5.detect import run as yolov5_test
+
+
 # 设置⽇志等级和输出⽇志格式
 log.basicConfig(level=log.DEBUG,
 format='%(asctime)s - %(filename)s[line:%(lineno)d] - %(levelname)s: %(message)s')
@@ -26,7 +29,7 @@ class UI_Image(QWidget):
         self.srcImagePath = ""
 
     def initUI(self):
-        self.setWindowTitle("PyQt OpenCV")
+        self.setWindowTitle("PyQt Pytorch-CV")
         self.openButton = QPushButton("OpenFile")
         self.openButton.clicked.connect(lambda: self.onButtonClick(self.openButton))
 
@@ -51,7 +54,7 @@ class UI_Image(QWidget):
 
         self.stackfilter = QWidget()
         self.Stack.addWidget(self.stackfilter)
-        self.filterUI()
+        self.filterUI(self.stackfilter)
 
         self.statckDemosic = QWidget()
         self.Stack.addWidget(self.statckDemosic)
@@ -107,20 +110,20 @@ class UI_Image(QWidget):
         self.showTabWidget = QTabWidget()
 
         self.showImageWidget = QWidget()
-        self.showTabWidget.addTab(self.showImageWidget, "image")
+        self.showTabWidget.addTab(self.showImageWidget, "showResult")
         self.showImageWidgetUI(self.showImageWidget)
 
-        self.showHistogramWidget = QWidget()
-        self.showTabWidget.addTab(self.showHistogramWidget, "Histogram")
-        self.showHistogramWidgetUI(self.showHistogramWidget)
+        # self.showHistogramWidget = QWidget()
+        # self.showTabWidget.addTab(self.showHistogramWidget, "Histogram")
+        # self.showHistogramWidgetUI(self.showHistogramWidget)
 
-        self.showMeanCurveWidget = QWidget()
-        self.showTabWidget.addTab(self.showMeanCurveWidget, "MeanCurve")
-        self.showMeanCurveWidgetUI(self.showMeanCurveWidget)
+        # self.showMeanCurveWidget = QWidget()
+        # self.showTabWidget.addTab(self.showMeanCurveWidget, "MeanCurve")
+        # self.showMeanCurveWidgetUI(self.showMeanCurveWidget)
 
-        self.showstitchWidget = QWidget()
-        self.showTabWidget.addTab(self.showstitchWidget, "stitchResult")
-        self.showstitchWidgetUI(self.showMeanCurveWidget)
+        # self.showstitchWidget = QWidget()
+        # self.showTabWidget.addTab(self.showstitchWidget, "stitchResult")
+        # self.showstitchWidgetUI(self.showMeanCurveWidget)
 
         self.showTabLayout = QHBoxLayout()
 
@@ -158,15 +161,15 @@ class UI_Image(QWidget):
         self.imagelabLayout = QHBoxLayout()
 
         self.srcImageLab = QLabel()
-        self.srcImageLab.setMinimumSize(320, 240)
+        self.srcImageLab.setMinimumSize(640, 640)
         self.srcImageLab.setStyleSheet("QLabel{background-color:rgb(0,0,0)}")
         self.srcImageLab.setScaledContents(True)
-        self.dstImageLab = QLabel()
-        self.dstImageLab.setMinimumSize(320, 240)
-        self.dstImageLab.setStyleSheet("QLabel{background-color:rgb(0,0,0)}")
-        self.dstImageLab.setScaledContents(True)
+        # self.dstImageLab = QLabel()
+        # self.dstImageLab.setMinimumSize(320, 240)
+        # self.dstImageLab.setStyleSheet("QLabel{background-color:rgb(0,0,0)}")
+        # self.dstImageLab.setScaledContents(True)
         self.imagelabLayout.addWidget(self.srcImageLab)
-        self.imagelabLayout.addWidget(self.dstImageLab)
+        # self.imagelabLayout.addWidget(self.dstImageLab)
 
         uilayout.setLayout(self.imagelabLayout)
     
@@ -391,7 +394,7 @@ class UI_Image(QWidget):
         self.CannythresholdEdit2.setValidator(pIntValidator)
         self.statckCannyDetect.setLayout(self.cannyFormLayout)
 
-    def filterUI(self):
+    def filterUI(self, uiLayout):
         self.filterTypelayout = QFormLayout()
         self.typeLabel = QLabel("type:")
         self.combox = QComboBox()
@@ -410,7 +413,7 @@ class UI_Image(QWidget):
         self.kernelSizeCombox.setCurrentText("5")
         self.filterTypelayout.addRow("kernel", self.filterSlider)
         self.filterTypelayout.addRow("kernelSize", self.kernelSizeCombox)
-        self.stackfilter.setLayout(self.filterTypelayout)
+        uiLayout.setLayout(self.filterTypelayout)
 
     def rawDemosicUI(self):
         self.typelayout = QFormLayout()
@@ -450,6 +453,7 @@ class UI_Image(QWidget):
 
     def showImage(self, showLabel, str):
         showLabel.setPixmap(QPixmap(str))
+        showLabel.setScaledContents(True)
 
     def DemosicHandle(self):
         if len(self.srcImagePath.strip()) > 0:
@@ -630,7 +634,10 @@ class UI_Image(QWidget):
         if btn.text() == "cal":
             print(self.leftlist.currentItem().text())
             if len(self.srcImagePath.strip()) > 0 or len(self.srcImagePaths) == 2:
-                if self.leftlist.currentItem().text() == "Demosic":
+                if self.leftlist.currentItem().text() == "YOLOv5":
+                    log.info("this is the yolov5 test")
+                    yolov5_test()
+                elif self.leftlist.currentItem().text() == "Demosic":
                     self.DemosicHandle()
                 elif self.leftlist.currentItem().text() == "滤波":
                     self.filterHandle()
