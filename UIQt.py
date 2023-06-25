@@ -8,9 +8,8 @@ import sys
 from numpy import histogram
 
 from yaml import warnings
-from Iimageprocess import Process
-
-from yolov5.detect import run as yolov5_test
+from Iimageprocess import Process, Show
+from imageProcessThread import imageProcessThread
 
 
 # 设置⽇志等级和输出⽇志格式
@@ -20,21 +19,24 @@ log.debug('这是⼀个debug级别的⽇志信息')
 
 
 
-class UI_Image(QWidget):
+class UI_Image(QWidget, Show):
     def __init__(self, parent=None):
         super(UI_Image, self).__init__(parent)
         self.initUI()
         self.setWindowIcon(QIcon("./icon.png"))
         self.process = Process()
+        self.yolov5Handler = Process()
         self.srcImagePath = ""
+        self.imageProcessThread = None
+        
 
     def initUI(self):
         self.setWindowTitle("PyQt Pytorch-CV")
         self.openButton = QPushButton("OpenFile")
         self.openButton.clicked.connect(lambda: self.onButtonClick(self.openButton))
 
-        self.chooseFilesButton = QPushButton("ChooseFiles...")
-        self.chooseFilesButton.clicked.connect(lambda: self.onButtonClick(self.chooseFilesButton))
+        # self.chooseFilesButton = QPushButton("ChooseFiles...")
+        # self.chooseFilesButton.clicked.connect(lambda: self.onButtonClick(self.chooseFilesButton))
 
         self.leftlist = QListWidget()
         self.leftlist.insertItem(0, "YOLOv5")
@@ -98,13 +100,13 @@ class UI_Image(QWidget):
 
         self.leftlist.currentRowChanged.connect(self.display)
 
-        self.calButton = QPushButton("cal")
+        self.calButton = QPushButton("Run")
         self.calButton.clicked.connect(lambda: self.onButtonClick(self.calButton))
 
         self.vlayout = QVBoxLayout()
         self.vlayout.addWidget(self.openButton)
         self.vlayout.addWidget(self.calButton)
-        self.vlayout.addWidget(self.chooseFilesButton)
+        # self.vlayout.addWidget(self.chooseFilesButton)
         self.vlayout.addStretch()
 
         self.showTabWidget = QTabWidget()
@@ -399,20 +401,27 @@ class UI_Image(QWidget):
         self.typeLabel = QLabel("type:")
         self.combox = QComboBox()
         self.combox.setObjectName("滤波")
-        self.combox.addItems(["None", "mean", "Gauss", "box", "2D", "median", "bil"])
+        self.combox.addItems(["Pt", "onnx"])
         self.filterTypelayout.addRow(self.typeLabel, self.combox)
-        self.filterSlider = QSlider(Qt.Horizontal)
-        self.filterSlider.setMinimum(3)
-        self.filterSlider.setMaximum(11)
-        self.filterSlider.setSingleStep(2)
-        self.filterSlider.setValue(5)
-        self.filterSlider.setTickPosition(QSlider.TicksBelow)
-        self.filterSlider.setTickInterval(2)
-        self.kernelSizeCombox = QComboBox()
-        self.kernelSizeCombox.addItems(["3", "5", "7", "9", "11", "13"])
-        self.kernelSizeCombox.setCurrentText("5")
-        self.filterTypelayout.addRow("kernel", self.filterSlider)
-        self.filterTypelayout.addRow("kernelSize", self.kernelSizeCombox)
+
+        self.pathLabel = QLabel("Path: ")
+        self.pathLineEdit = QLineEdit()
+        self.pathLineEdit.setReadOnly(True)
+        self.filterTypelayout.addRow(self.pathLabel, self.pathLineEdit)
+
+
+        # self.filterSlider = QSlider(Qt.Horizontal)
+        # self.filterSlider.setMinimum(3)
+        # self.filterSlider.setMaximum(11)
+        # self.filterSlider.setSingleStep(2)
+        # self.filterSlider.setValue(5)
+        # self.filterSlider.setTickPosition(QSlider.TicksBelow)
+        # self.filterSlider.setTickInterval(2)
+        # self.kernelSizeCombox = QComboBox()
+        # self.kernelSizeCombox.addItems(["3", "5", "7", "9", "11", "13"])
+        # self.kernelSizeCombox.setCurrentText("5")
+        # self.filterTypelayout.addRow("kernel", self.filterSlider)
+        # self.filterTypelayout.addRow("kernelSize", self.kernelSizeCombox)
         uiLayout.setLayout(self.filterTypelayout)
 
     def rawDemosicUI(self):
@@ -451,9 +460,22 @@ class UI_Image(QWidget):
 
         self.statckDemosic.setLayout(self.typelayout)
 
+    def showMatImage(self, mat):
+        dst = QImage(mat.data, mat.shape[1], mat.shape[0], mat.shape[1]*mat.shape[2], QImage.Format.Format_RGB888)
+        # showLabel.setPixmap(QPixmap(str))
+        self.srcImageLab.setPixmap(QPixmap.fromImage(dst.rgbSwapped()))
+
+
     def showImage(self, showLabel, str):
-        showLabel.setPixmap(QPixmap(str))
-        showLabel.setScaledContents(True)
+        print("....")
+        import cv2
+        src = cv2.imread(str)
+        # src = cv2.cvtColor(src, cv2.COLOR_BGR2RGB)
+        print(src.shape)
+        dst = QImage(src.data, src.shape[1], src.shape[0], src.shape[1]*src.shape[2], QImage.Format.Format_RGB888)
+        # showLabel.setPixmap(QPixmap(str))
+        showLabel.setPixmap(QPixmap.fromImage(dst.rgbSwapped()))
+        # showLabel.setScaledContents(True)
 
     def DemosicHandle(self):
         if len(self.srcImagePath.strip()) > 0:
@@ -631,12 +653,17 @@ class UI_Image(QWidget):
                 self.stitchInfo["Algo"] = "ORB"
 
     def onButtonClick(self, btn):
-        if btn.text() == "cal":
+        if btn.text() == "Run":
             print(self.leftlist.currentItem().text())
             if len(self.srcImagePath.strip()) > 0 or len(self.srcImagePaths) == 2:
                 if self.leftlist.currentItem().text() == "YOLOv5":
                     log.info("this is the yolov5 test")
-                    yolov5_test(source=self.srcImagePath)
+
+                    # TODO-A 放到线程中处理，释放前台
+                    # self.yolov5Handler.imageprocess(self.srcImagePath)
+                    self.imageProcessThread = imageProcessThread()
+                    self.imageProcessThread.setHandlerAndPath(self.yolov5Handler.imageprocess, self.srcImagePath)
+                    self.imageProcessThread.start()
             else:
                 log.error("str is None")
 
@@ -645,24 +672,28 @@ class UI_Image(QWidget):
                 self,
                 "Open file",
                 QDir.currentPath(),
-                "Image files (*.jpg *.gif *.png *.raw *.bin)",
+                "Image files (*.jpg *.gif *.png *.mp4)",
             )
-            if not self.srcImagePath.endswith(
-                ".raw"
-            ) and not self.srcImagePath.endswith(".bin"):
-                self.showImage(self.srcImageLab, self.srcImagePath)
+            self.pathLineEdit.setText(self.srcImagePath)
+            # if not self.srcImagePath.endswith(
+            #     ".raw"
+            # ) and not self.srcImagePath.endswith(".bin"):
+            #     self.showImage(self.srcImageLab, self.srcImagePath)
 
-        if btn.text()  == "ChooseFiles...":
-            self.srcImagePaths, _ = QFileDialog.getOpenFileNames(
-                self,
-                "Open files",
-                QDir.currentPath(),
-                "Image files (*.jpg *.gif *.png)",
-            )
-            if len(self.srcImagePaths) == 2:
-                self.showImage(self.srcImageLab, self.srcImagePaths[0])
-                self.showImage(self.dstImageLab, self.srcImagePaths[1])
+        # if btn.text()  == "ChooseFiles...":
+        #     self.srcImagePaths, _ = QFileDialog.getOpenFileNames(
+        #         self,
+        #         "Open files",
+        #         QDir.currentPath(),
+        #         "Image files (*.jpg *.gif *.png)",
+        #     )
+        #     if len(self.srcImagePaths) == 2:
+        #         self.showImage(self.srcImageLab, self.srcImagePaths[0])
+        #         self.showImage(self.dstImageLab, self.srcImagePaths[1])
 
 
     def setImagePorcess(self, imgprocess):
         self.process = imgprocess
+
+    def setYoloV4Process(self, yolov5Handle):
+        self.yolov5Handler = yolov5Handle

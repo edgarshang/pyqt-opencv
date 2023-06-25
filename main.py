@@ -3,6 +3,7 @@ from PyQt5.QtWidgets import QApplication
 
 from UIQt import UI_Image
 from imageProcess import opencvImage
+from yolov5_test import YOLOV5_Process
 
 import platform
 import os
@@ -21,7 +22,13 @@ else:
 if __name__ == "__main__":
     app = QApplication(sys.argv)
     imageProc = opencvImage()
+    yolov5 = YOLOV5_Process()
+    
     m_ui = UI_Image()
     m_ui.setImagePorcess(imageProc)
+    m_ui.setYoloV4Process(yolov5)
+
+    yolov5.setShowImage(m_ui.showMatImage)
+
     m_ui.show()
     sys.exit(app.exec_())
