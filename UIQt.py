@@ -655,14 +655,18 @@ class UI_Image(QWidget, Show):
     def onButtonClick(self, btn):
         if btn.text() == "Run":
             print(self.leftlist.currentItem().text())
-            if len(self.srcImagePath.strip()) > 0 or len(self.srcImagePaths) == 2:
+            if len(self.srcImagePath.strip()) > 0:
                 if self.leftlist.currentItem().text() == "YOLOv5":
                     log.info("this is the yolov5 test")
 
-                    # TODO-A 放到线程中处理，释放前台
-                    # self.yolov5Handler.imageprocess(self.srcImagePath)
+                    imageInfo = {
+                    "namePath": self.srcImagePath,
+                    "typeCal": self.combox.currentText(),
+                    }
+
+                    # Done 放到线程中处理，释放前台
                     self.imageProcessThread = imageProcessThread()
-                    self.imageProcessThread.setHandlerAndPath(self.yolov5Handler.imageprocess, self.srcImagePath)
+                    self.imageProcessThread.setHandlerAndPath(self.yolov5Handler.imageprocess, imageInfo)
                     self.imageProcessThread.start()
             else:
                 log.error("str is None")
@@ -695,5 +699,5 @@ class UI_Image(QWidget, Show):
     def setImagePorcess(self, imgprocess):
         self.process = imgprocess
 
-    def setYoloV4Process(self, yolov5Handle):
+    def setYoloV5Process(self, yolov5Handle):
         self.yolov5Handler = yolov5Handle

@@ -9,5 +9,9 @@ class YOLOV5_Process(Process):
     
     def imageprocess(self, imageInfo):
         print("yolo v5")
-        yolov5_run(source=imageInfo, showCallBack=self.showImage)
-        pass
+        imagePath = imageInfo["namePath"]
+        if imageInfo["typeCal"] == "Pt":
+            model = "yolov5s.pt"
+        elif imageInfo["typeCal"] == "onnx":
+            model = "yolov5s.onnx"
+        yolov5_run(weights=model, source=imagePath, showCallBack=self.showImage)

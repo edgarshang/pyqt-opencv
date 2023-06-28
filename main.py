@@ -26,7 +26,7 @@ if __name__ == "__main__":
     
     m_ui = UI_Image()
     m_ui.setImagePorcess(imageProc)
-    m_ui.setYoloV4Process(yolov5)
+    m_ui.setYoloV5Process(yolov5)
 
     yolov5.setShowImage(m_ui.showMatImage)
 
