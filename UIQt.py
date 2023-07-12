@@ -26,6 +26,7 @@ class UI_Image(QWidget, Show):
         self.setWindowIcon(QIcon("./icon.png"))
         self.process = Process()
         self.yolov5Handler = Process()
+        self.yolov8Handler = Process()
         self.srcImagePath = ""
         self.imageProcessThread = None
         
@@ -35,15 +36,22 @@ class UI_Image(QWidget, Show):
         self.openButton = QPushButton("OpenFile")
         self.openButton.clicked.connect(lambda: self.onButtonClick(self.openButton))
 
+        self.calButton = QPushButton("Run")
+        self.calButton.clicked.connect(lambda: self.onButtonClick(self.calButton))
+
+        self.chooseFolderButton = QPushButton("ImageFolder...")
+        self.chooseFolderButton.clicked.connect(lambda: self.onButtonClick(self.chooseFolderButton))
+
         # self.chooseFilesButton = QPushButton("ChooseFiles...")
         # self.chooseFilesButton.clicked.connect(lambda: self.onButtonClick(self.chooseFilesButton))
 
         self.leftlist = QListWidget()
         self.leftlist.insertItem(0, "YOLOv5")
-        self.leftlist.insertItem(1, "FasterRcnn")
-        self.leftlist.insertItem(2, "MaskRcnn")
-        self.leftlist.insertItem(3, "Unet")
-        self.leftlist.insertItem(4, "YOLOv8") 
+        self.leftlist.insertItem(1, "YOLOv8") 
+        self.leftlist.insertItem(2, "FasterRcnn")
+        self.leftlist.insertItem(3, "MaskRcnn")
+        self.leftlist.insertItem(4, "Unet")
+        
 
 
         self.stacklayout = QHBoxLayout()
@@ -58,54 +66,31 @@ class UI_Image(QWidget, Show):
         self.Stack.addWidget(self.stackfilter)
         self.filterUI(self.stackfilter)
 
-        self.statckDemosic = QWidget()
-        self.Stack.addWidget(self.statckDemosic)
-        self.rawDemosicUI()
+        # self.statckDemosic = QWidget()
+        # self.Stack.addWidget(self.statckDemosic)
+        # self.rawDemosicUI()
 
-        self.statckCannyDetect = QWidget()
-        self.Stack.addWidget(self.statckCannyDetect)
-        self.CannyedgeDetectionUI()
+        # self.statckCannyDetect = QWidget()
+        # self.Stack.addWidget(self.statckCannyDetect)
+        # self.CannyedgeDetectionUI()
 
-        self.stackThresholding = QWidget()
-        self.Stack.addWidget(self.stackThresholding)
-        self.ThresholdingUI()
+        # self.stackThresholding = QWidget()
+        # self.Stack.addWidget(self.stackThresholding)
+        # self.ThresholdingUI()
 
-        self.stackGeomTrans = QWidget()
-        self.Stack.addWidget(self.stackGeomTrans)
-        self.GromTransFormUI(self.stackGeomTrans)
-
-        self.morphology = QWidget()
-        self.Stack.addWidget(self.morphology)
-        self.MorphologyUI(self.morphology)
-
-        self.imageGradient = QWidget()
-        self.Stack.addWidget(self.imageGradient)
-        self.imageGradientUI(self.imageGradient)
-
-        self.imagePyramid = QWidget()
-        self.Stack.addWidget(self.imagePyramid)
-        self.imagePyramidUI(self.imagePyramid)
-
-        self.imageHist = QWidget()
-        self.Stack.addWidget(self.imageHist)
-        self.imageHistUI(self.imageHist)
-
-        self.imageFourTrans = QWidget()
-        self.Stack.addWidget(self.imageFourTrans)
-        self.imageFourTransUI(self.imageFourTrans)
-
-        self.imageStitching = QWidget()
-        self.Stack.addWidget(self.imageStitching)
-        self.imageStitchingUI(self.imageStitching)
+        # self.stackGeomTrans = QWidget()
+        # self.Stack.addWidget(self.stackGeomTrans)
+        # self.GromTransFormUI(self.stackGeomTrans)
 
         self.leftlist.currentRowChanged.connect(self.display)
 
-        self.calButton = QPushButton("Run")
-        self.calButton.clicked.connect(lambda: self.onButtonClick(self.calButton))
+        
 
         self.vlayout = QVBoxLayout()
         self.vlayout.addWidget(self.openButton)
         self.vlayout.addWidget(self.calButton)
+        self.vlayout.addWidget(self.chooseFolderButton)
+        
         # self.vlayout.addWidget(self.chooseFilesButton)
         self.vlayout.addStretch()
 
@@ -219,189 +204,13 @@ class UI_Image(QWidget, Show):
         uilayout.setLayout(hlayoutStitch)
 
 
-    def imageFourTransUI(self, uilayout):
-        self.imageFourTransFormLayout = QFormLayout()
-        self.imageFourTransCombox = QComboBox()
-        self.imageFourTransCombox.addItems(["傅里叶变换", "逆傅里叶变换", "高通滤波", "低通滤波", "cv傅里叶变换", "cv逆傅里叶变换", "cv低通滤波"])
-        self.imageFourTransFormLayout.addRow("Type:", self.imageFourTransCombox)
-        self.imageFourTransLineEdit = QLineEdit("30")
-        self.imageFourTransFormLayout.addRow("frequency:", self.imageFourTransLineEdit)
-
-        uilayout.setLayout(self.imageFourTransFormLayout)
-        
-
-    def imageHistUI(self, uilayout):
-        self.imageHistFormLayout = QFormLayout()
-        self.imageHistCombox = QComboBox()
-
-        self.imageHistCombox.addItems(["numpy", "CV2", "直方图均衡"])
-        self.imageHistFormLayout.addRow("TypeHis:", self.imageHistCombox)
-
-        self.imageHistBins = QLineEdit("256")
-        self.imageHistFormLayout.addRow("Bins:", self.imageHistBins)
-        uilayout.setLayout(self.imageHistFormLayout)
-
-
-    def imagePyramidUI(self, uilayout):
-        self.imagePyramidFormLayout = QFormLayout()
-        self.imagePyramidCombox = QComboBox()
-
-        self.imagePyramidCombox.addItems(["高斯上采样", "高斯下采样", "拉普拉斯金字塔"])
-        self.imagePyramidFormLayout.addRow("采样：", self.imagePyramidCombox)
-
-        uilayout.setLayout(self.imagePyramidFormLayout)
-
-    def imageGradientUI(self, uilayout):
-        self.imageGradientFormLayout = QFormLayout()
-
-        self.imageGradientCombox = QComboBox()
-        self.imageGradientCombox.addItems(["Sobel", "Scharr", "Laplacian"])
-
-        self.imageGradientCheckBoxX = QCheckBox("x 方向")
-        self.imageGradientCheckBoxX.setChecked(True)
-        self.imageGradientCheckBoxY = QCheckBox("y 方向")
-
-        self.imageGradientFormLayout.addRow("算子:", self.imageGradientCombox)
-        self.imageGradientFormLayout.addRow("X:", self.imageGradientCheckBoxX)
-        self.imageGradientFormLayout.addRow("Y:", self.imageGradientCheckBoxY)
-
-        uilayout.setLayout(self.imageGradientFormLayout)
-
-    def MorphologyUI(self, uilayout):
-        self.morphologyFormLayout = QFormLayout()
-
-        self.MorphologyCombox = QComboBox()
-        self.MorphologyCombox.addItems(["腐蚀", "膨胀", "开运算", "闭运算", "礼帽运算", "黑帽运算"])
-        self.morphologyFormLayout.addRow("MorphType:", self.MorphologyCombox)
-        self.MorphologyKernelCombox = QComboBox()
-        self.MorphologyKernelCombox.addItems(["3", "5", "7", "9", "11", "13"])
-        self.morphologyFormLayout.addRow("Kernel:", self.MorphologyKernelCombox)
-        self.MorphologyCountSpinBox = QSpinBox()
-        self.MorphologyCountSpinBox.setMaximum(3)
-        self.morphologyFormLayout.addRow("Count:", self.MorphologyCountSpinBox)
-
-        uilayout.setLayout(self.morphologyFormLayout)
-
-    def GromTransFormUI(self, uiLayout):
-        self.gromTransFormLayout = QFormLayout()
-        self.gromTransFormCombox = QComboBox()
-        self.gromTransFormCombox.addItems(["缩放", "翻转", "访射", "旋转", "透视", "重映射"])
-        self.gromTransFormLayout.addRow("tranType:", self.gromTransFormCombox)
-        self.gromTransFormDxEdit = QLineEdit("1")
-        self.gromTransFormDyEdit = QLineEdit("1")
-
-        self.gromTransFormLayout.addRow("fx:", self.gromTransFormDxEdit)
-        self.gromTransFormLayout.addRow("fy:", self.gromTransFormDyEdit)
-
-        self.gromTransCombox = QComboBox()
-        self.gromTransCombox.addItems(["0", "1", "-1"])
-        self.gromTransCombox.setCurrentText("0")
-        self.gromTransFormLayout.addRow("rotate:", self.gromTransCombox)
-
-        self.gromTransPanMoveX = QLineEdit("100")
-        self.gromTransPanMoveY = QLineEdit("100")
-
-        self.gromTransFormLayout.addRow("PanX:", self.gromTransPanMoveX)
-        self.gromTransFormLayout.addRow("PanX:", self.gromTransPanMoveY)
-
-        self.geomTransFormAngle = QLineEdit("45")
-        self.geomTransFormScale = QLineEdit("0.5")
-
-        self.gromTransFormLayout.addRow("angle:", self.geomTransFormAngle)
-        self.gromTransFormLayout.addRow("scale:", self.geomTransFormScale)
-
-        uiLayout.setLayout(self.gromTransFormLayout)
-
-    def ThresholdingUI(self):
-        self.thresholdFormLayout = QFormLayout()
-        self.thresholdLabel = QLabel("阈值类型:")
-        self.thresholdCombox = QComboBox()
-        self.thresholdCombox.setObjectName("阈值")
-        self.thresholdCombox.addItems(
-            ["二值化", "反二值化", "截断阈值", "超阈值零", "低阈值零", "自适应阈值", "Otsu"]
-        )
-        self.thresholdLabelVal = QLabel("阈值:")
-        self.thresholdEditVal = QLineEdit("127")
-        self.thresholdLabelMaxVal = QLabel("MaxVal:")
-        self.thresholdEditMaxVal = QLineEdit("255")
-        self.thresholdFormLayout.addRow(self.thresholdLabel, self.thresholdCombox)
-        self.thresholdFormLayout.addRow(self.thresholdLabelVal, self.thresholdEditVal)
-        self.thresholdFormLayout.addRow(
-            self.thresholdLabelMaxVal, self.thresholdEditMaxVal
-        )
-        self.thresholdMethodGroupBox = QGroupBox("自适应方法")
-
-        self.thresholdNibRadiobutton = QRadioButton("邻阈像素点")
-
-        self.thresholdNibRadiobutton.toggled.connect(
-            lambda: self.onRadioButtonToggled(self.thresholdNibRadiobutton)
-        )
-
-        self.thresholdGusRadiobutton = QRadioButton("高斯")
-        self.thresholdGusRadiobutton.setChecked(True)
-
-        self.thresholdGusRadiobutton.toggled.connect(
-            lambda: self.onRadioButtonToggled(self.thresholdGusRadiobutton)
-        )
-
-        self.thresholdMethodVBoxLayout = QVBoxLayout()
-        self.thresholdMethodVBoxLayout.addWidget(self.thresholdNibRadiobutton)
-        self.thresholdMethodVBoxLayout.addWidget(self.thresholdGusRadiobutton)
-        self.thresholdMethodGroupBox.setLayout(self.thresholdMethodVBoxLayout)
-
-        self.thresholdTypeGroupBox = QGroupBox("thresholdType")
-
-        self.thresholdBinRadiobutton = QRadioButton("BINARY")
-        self.thresholdBinRadiobutton.setChecked(True)
-        self.thresStatusInfo = {"method": "高斯", "thresholdType": "BINARY"}
-
-        self.thresholdBinRadiobutton.toggled.connect(
-            lambda: self.onRadioButtonToggled(self.thresholdBinRadiobutton)
-        )
-
-        self.thresholdBinInvRadiobutton = QRadioButton("BINARY_INV")
-
-        self.thresholdBinInvRadiobutton.toggled.connect(
-            lambda: self.onRadioButtonToggled(self.thresholdBinInvRadiobutton)
-        )
-
-        self.thresholdTypeVBoxLayout = QVBoxLayout()
-        self.thresholdTypeVBoxLayout.addWidget(self.thresholdBinRadiobutton)
-        self.thresholdTypeVBoxLayout.addWidget(self.thresholdBinInvRadiobutton)
-        self.thresholdTypeGroupBox.setLayout(self.thresholdTypeVBoxLayout)
-
-        self.thresholdFormLayout.addRow("自适应方法", self.thresholdMethodGroupBox)
-        self.thresholdFormLayout.addRow("阈值处理方式", self.thresholdTypeGroupBox)
-
-        # pIntValidator = QIntValidator(self)
-        # pIntValidator.setRange(1, 99)
-        pIntValidator = QIntValidator(self)
-        pIntValidator.setRange(1, 254)
-        self.thresholdEditVal.setValidator(pIntValidator)
-        self.thresholdEditMaxVal.setValidator(pIntValidator)
-
-        self.stackThresholding.setLayout(self.thresholdFormLayout)
-
-    def CannyedgeDetectionUI(self):
-        self.cannyFormLayout = QFormLayout()
-        thresholdLabel1 = QLabel("threshold-1:")
-        self.CannythresholdEdit1 = QLineEdit("32")
-        thresholdLabel2 = QLabel("threshold-2:")
-        self.CannythresholdEdit2 = QLineEdit("128")
-        self.cannyFormLayout.addRow(thresholdLabel1, self.CannythresholdEdit1)
-        self.cannyFormLayout.addRow(thresholdLabel2, self.CannythresholdEdit2)
-        pIntValidator = QIntValidator(self)
-        pIntValidator.setRange(1, 254)
-        self.CannythresholdEdit1.setValidator(pIntValidator)
-        self.CannythresholdEdit2.setValidator(pIntValidator)
-        self.statckCannyDetect.setLayout(self.cannyFormLayout)
+  
 
     def filterUI(self, uiLayout):
         self.filterTypelayout = QFormLayout()
         self.typeLabel = QLabel("type:")
         self.combox = QComboBox()
-        self.combox.setObjectName("滤波")
-        self.combox.addItems(["Pt", "onnx"])
+        self.combox.addItems(["Pt", "onnx","fruit_self"])
         self.filterTypelayout.addRow(self.typeLabel, self.combox)
 
         self.pathLabel = QLabel("Path: ")
@@ -409,56 +218,16 @@ class UI_Image(QWidget, Show):
         self.pathLineEdit.setReadOnly(True)
         self.filterTypelayout.addRow(self.pathLabel, self.pathLineEdit)
 
+        self.deployLabel = QLabel("Deploy Mode: ")
+        self.deployComboBox = QComboBox()
+        self.deployComboBox.addItems(["Openvino", "onnxruntime","tensorrt", "opencv"])
+        self.filterTypelayout.addRow(self.deployLabel, self.deployComboBox)
 
-        # self.filterSlider = QSlider(Qt.Horizontal)
-        # self.filterSlider.setMinimum(3)
-        # self.filterSlider.setMaximum(11)
-        # self.filterSlider.setSingleStep(2)
-        # self.filterSlider.setValue(5)
-        # self.filterSlider.setTickPosition(QSlider.TicksBelow)
-        # self.filterSlider.setTickInterval(2)
-        # self.kernelSizeCombox = QComboBox()
-        # self.kernelSizeCombox.addItems(["3", "5", "7", "9", "11", "13"])
-        # self.kernelSizeCombox.setCurrentText("5")
-        # self.filterTypelayout.addRow("kernel", self.filterSlider)
-        # self.filterTypelayout.addRow("kernelSize", self.kernelSizeCombox)
         uiLayout.setLayout(self.filterTypelayout)
 
-    def rawDemosicUI(self):
-        self.typelayout = QFormLayout()
-        self.wightLabel = QLabel("W:")
-        self.wightLineEdit = QLineEdit()
-        self.wightLineEdit.setText("2688")
-        self.typelayout.addRow(self.wightLabel, self.wightLineEdit)
+    def imageshow(self, info):
+        self.showMatImage(info)
 
-        self.highLabel = QLabel("H:")
-        self.highLineEdit = QLineEdit()
-        self.highLineEdit.setText("1520")
-        self.typelayout.addRow(self.highLabel, self.highLineEdit)
-
-        reg = QRegExp("[0-9]+$")
-        pValidator = QRegExpValidator(self)
-        pValidator.setRegExp(reg)
-
-        self.wightLineEdit.setValidator(pValidator)
-        self.highLineEdit.setValidator(pValidator)
-
-        self.bitLabel = QLabel("Bit:")
-        self.bitcombox = QComboBox()
-        self.bitcombox.addItems(["16", "8", "12", "14"])
-        self.typelayout.addRow(self.bitLabel, self.bitcombox)
-
-        self.patternLabel = QLabel("Pattern:")
-        self.patternComBox = QComboBox()
-        self.patternComBox.addItems(["RGGB", "BGGR", "GRBG", "GBRG"])
-        self.typelayout.addRow(self.patternLabel, self.patternComBox)
-
-        self.blacklevelLabel = QLabel("BlackLevel:")
-        self.blacklevelLineEdit = QLineEdit("4096")
-        self.blacklevelLineEdit.setValidator(pValidator)
-        self.typelayout.addRow(self.blacklevelLabel, self.blacklevelLineEdit)
-
-        self.statckDemosic.setLayout(self.typelayout)
 
     def showMatImage(self, mat):
         dst = QImage(mat.data, mat.shape[1], mat.shape[0], mat.shape[1]*mat.shape[2], QImage.Format.Format_RGB888)
@@ -668,16 +437,31 @@ class UI_Image(QWidget, Show):
                     self.imageProcessThread = imageProcessThread()
                     self.imageProcessThread.setHandlerAndPath(self.yolov5Handler.imageprocess, imageInfo)
                     self.imageProcessThread.start()
+                elif self.leftlist.currentItem().text() == "YOLOv8":
+                    log.info("this is the yolov8 test")
+                    imageInfo = {
+                    "namePath": self.srcImagePath,
+                    "typeCal": self.combox.currentText(),
+                    "deploy": self.deployComboBox.currentText(),
+                    }
+                    self.imageProcessThread = imageProcessThread()
+                    self.imageProcessThread.setHandlerAndPath(self.yolov8Handler.imageprocess, imageInfo)
+                    self.imageProcessThread.start()
             else:
                 log.error("str is None")
-
-        if btn.text() == "OpenFile":
+        elif btn.text() == "OpenFile":
             self.srcImagePath, _ = QFileDialog.getOpenFileName(
                 self,
                 "Open file",
                 QDir.currentPath(),
                 "Image files (*.jpg *.gif *.png *.mp4)",
             )
+            self.pathLineEdit.setText(self.srcImagePath)
+            # print(_)
+            
+        elif btn.text() == "ImageFolder...":
+            print("choose the test Folder")
+            self.srcImagePath = QFileDialog.getExistingDirectory(self, "choose the folder...", QDir.currentPath())
             self.pathLineEdit.setText(self.srcImagePath)
             # if not self.srcImagePath.endswith(
             #     ".raw"
@@ -701,3 +485,6 @@ class UI_Image(QWidget, Show):
 
     def setYoloV5Process(self, yolov5Handle):
         self.yolov5Handler = yolov5Handle
+
+    def setYoloV8Process(self, yolov5Handle):
+        self.yolov8Handler = yolov5Handle
