@@ -42,7 +42,10 @@ class YOLOV8_Process(Process):
             output_layer = self.mode.output(0)
         elif imageInfo["deploy"] == "onnxruntime":
             self.mode = onnxruntime.InferenceSession("yolov8n.onnx",
-                                                    providers=['CUDAExecutionProvider'])
+                                                    providers=['CUDAExecutionProvider', 'CPUExecutionProvider'])
+            
+            #  providers = ['CUDAExecutionProvider', 'CPUExecutionProvider'] if cuda else ['CPUExecutionProvider']
+            # session = onnxruntime.InferenceSession(w, providers=providers)
             
 
             
