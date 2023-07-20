@@ -12,3 +12,6 @@ class imageProcessThread(Thread):
     def run(self):
         self.imageProcess(self.filepath)
         print("Done")
+
+    def stop(self):
+        self.terminate()

@@ -1,5 +1,6 @@
 import logging as log
 import this
+from PyQt5 import QtGui
 from PyQt5.QtWidgets import *
 from PyQt5.QtCore import *
 from PyQt5.QtGui import *
@@ -27,6 +28,7 @@ class UI_Image(QWidget, Show):
         self.process = Process()
         self.yolov5Handler = Process()
         self.yolov8Handler = Process()
+        self.landmarkHandler = Process()
         self.srcImagePath = ""
         self.imageProcessThread = None
         
@@ -47,10 +49,11 @@ class UI_Image(QWidget, Show):
 
         self.leftlist = QListWidget()
         self.leftlist.insertItem(0, "YOLOv5")
-        self.leftlist.insertItem(1, "YOLOv8") 
+        self.leftlist.insertItem(1, "YOLOv8")
         self.leftlist.insertItem(2, "FasterRcnn")
         self.leftlist.insertItem(3, "MaskRcnn")
         self.leftlist.insertItem(4, "Unet")
+        self.leftlist.insertItem(5, "LandMark")
         
 
 
@@ -222,6 +225,10 @@ class UI_Image(QWidget, Show):
         self.deployComboBox = QComboBox()
         self.deployComboBox.addItems(["Openvino", "onnxruntime","tensorrt", "opencv"])
         self.filterTypelayout.addRow(self.deployLabel, self.deployComboBox)
+
+        self.cameraLabel = QLabel("Camera :")
+        self.cameraCheckBox = QCheckBox()
+        self.filterTypelayout.addRow(self.cameraLabel, self.cameraCheckBox)
 
         uiLayout.setLayout(self.filterTypelayout)
 
@@ -423,7 +430,7 @@ class UI_Image(QWidget, Show):
 
     def onButtonClick(self, btn):
         if btn.text() == "Run":
-            print(self.leftlist.currentItem().text())
+            log.debug(self.leftlist.currentItem().text())
             if len(self.srcImagePath.strip()) > 0:
                 if self.leftlist.currentItem().text() == "YOLOv5":
                     log.info("this is the yolov5 test")
@@ -438,7 +445,7 @@ class UI_Image(QWidget, Show):
                     self.imageProcessThread.setHandlerAndPath(self.yolov5Handler.imageprocess, imageInfo)
                     self.imageProcessThread.start()
                 elif self.leftlist.currentItem().text() == "YOLOv8":
-                    log.info("this is the yolov8 test")
+                    log.debug("this is the yolov8 test")
                     imageInfo = {
                     "namePath": self.srcImagePath,
                     "typeCal": self.combox.currentText(),
@@ -447,6 +454,15 @@ class UI_Image(QWidget, Show):
                     self.imageProcessThread = imageProcessThread()
                     self.imageProcessThread.setHandlerAndPath(self.yolov8Handler.imageprocess, imageInfo)
                     self.imageProcessThread.start()
+                elif self.leftlist.currentItem().text() == "LandMark":
+                    log.debug(f'land mark')
+                    imageInfo = {
+                    "namePath": self.srcImagePath,
+                    "camera":self.cameraCheckBox.isChecked()
+                    }
+                    self.imageProcessThread = imageProcessThread()
+                    self.imageProcessThread.setHandlerAndPath(self.landmarkHandler.imageprocess, imageInfo)
+                    self.imageProcessThread.start()
             else:
                 log.error("str is None")
         elif btn.text() == "OpenFile":
@@ -454,7 +470,7 @@ class UI_Image(QWidget, Show):
                 self,
                 "Open file",
                 QDir.currentPath(),
-                "Image files (*.jpg *.gif *.png *.mp4)",
+                "Image files (*.jpg *.gif *.png *.mp4 *.jpeg)",
             )
             self.pathLineEdit.setText(self.srcImagePath)
             # print(_)
@@ -488,3 +504,11 @@ class UI_Image(QWidget, Show):
 
     def setYoloV8Process(self, yolov5Handle):
         self.yolov8Handler = yolov5Handle
+    
+    def setLandMarkProcess(self, landMarkHandle):
+        self.landmarkHandler = landMarkHandle
+
+    def closeEvent(self, a0: QCloseEvent) -> None:
+        print("close it")
+        self.imageProcessThread.stop()
+        return super().closeEvent(a0)
