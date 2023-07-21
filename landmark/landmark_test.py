@@ -4,6 +4,7 @@ import torch
 from pathlib import Path
 import os
 import glob
+import time
 
 IMG_FORMATS = 'bmp', 'dng', 'jpeg', 'jpg', 'mpo', 'png', 'tif', 'tiff', 'webp', 'pfm'  # include image suffixes
 VID_FORMATS = 'asf', 'avi', 'gif', 'm4v', 'mkv', 'mov', 'mp4', 'mpeg', 'mpg', 'ts', 'wmv'  # include video suffixes
@@ -45,6 +46,7 @@ class landMark_Process(Process):
         return new_mode
     
     def frameHandle(self, frame):
+        start_time = time.time()
         h,w,c = frame.shape
         blobImage = cv2.dnn.blobFromImage(frame, 1.0, (300, 300), (104.0, 177.0, 123.0), False, False)
         self.face_model_detect.setInput(blobImage)
@@ -82,7 +84,10 @@ class landMark_Process(Process):
                     x1 = x * rw
                     y1 = y * rh
                     cv2.circle(roi, (np.int32(x1), np.int32(y1)), 2, (0, 0, 255), 2, 8, 0)
-
+                inf_end = time.time() - start_time
+                fps = 1 / inf_end
+                fps_label = "FPS: %.2f" % fps
+                cv2.putText(frame, fps_label, (20, 45), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 0, 255), 2)
                 # 绘制
                 cv2.rectangle(frame, (int(left), int(top)), (int(right), int(bottom)), (255, 0, 0), thickness=2)
                 cv2.putText(frame, "score:%.2f"%score, (int(left), int(top)), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 0, 255), 1)

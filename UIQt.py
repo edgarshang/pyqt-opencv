@@ -29,8 +29,12 @@ class UI_Image(QWidget, Show):
         self.yolov5Handler = Process()
         self.yolov8Handler = Process()
         self.landmarkHandler = Process()
+        self.ageGentleHandler = Process()
         self.srcImagePath = ""
         self.imageProcessThread = None
+        self.defaultSetting()
+
+    
         
 
     def initUI(self):
@@ -54,6 +58,7 @@ class UI_Image(QWidget, Show):
         self.leftlist.insertItem(3, "MaskRcnn")
         self.leftlist.insertItem(4, "Unet")
         self.leftlist.insertItem(5, "LandMark")
+        self.leftlist.insertItem(6, "AgeGentle")
         
 
 
@@ -205,6 +210,18 @@ class UI_Image(QWidget, Show):
         # 
 
         uilayout.setLayout(hlayoutStitch)
+
+    def defaultSetting(self):
+        self.settings = QSettings("config.ini", QSettings.IniFormat)
+        
+        self.pathLineEdit.setText(self.settings.value("SETTING/ImagePath"))
+
+        self.srcImagePath = self.pathLineEdit.text()
+        # log.debug(f'srcImagepaht is {self.srcImagePath}')
+        # log.debug(len(self.srcImagePath.strip()))
+
+        # ui.lineEditIPAddr.setText(settings.value("SERVER/server_ip"))
+        # ui.lineEditPort.setText(settings.value("SERVER/server_port"))                       
 
 
   
@@ -431,6 +448,8 @@ class UI_Image(QWidget, Show):
     def onButtonClick(self, btn):
         if btn.text() == "Run":
             log.debug(self.leftlist.currentItem().text())
+            log.debug(len(self.srcImagePath.strip()))
+            log.debug(self.srcImagePath)
             if len(self.srcImagePath.strip()) > 0:
                 if self.leftlist.currentItem().text() == "YOLOv5":
                     log.info("this is the yolov5 test")
@@ -463,6 +482,16 @@ class UI_Image(QWidget, Show):
                     self.imageProcessThread = imageProcessThread()
                     self.imageProcessThread.setHandlerAndPath(self.landmarkHandler.imageprocess, imageInfo)
                     self.imageProcessThread.start()
+                elif self.leftlist.currentItem().text() == "AgeGentle":
+                    log.debug(f'AgeGentle')
+                    imageInfo = {
+                        "namePath": self.srcImagePath,
+                        "camera":self.cameraCheckBox.isChecked()
+                    }
+                    self.imageProcessThread = imageProcessThread()
+                    self.imageProcessThread.setHandlerAndPath(self.ageGentleHandler.imageprocess, imageInfo)
+                    self.imageProcessThread.start()
+
             else:
                 log.error("str is None")
         elif btn.text() == "OpenFile":
@@ -473,12 +502,14 @@ class UI_Image(QWidget, Show):
                 "Image files (*.jpg *.gif *.png *.mp4 *.jpeg)",
             )
             self.pathLineEdit.setText(self.srcImagePath)
+            self.settings.setValue("SETTING/ImagePath", self.srcImagePath)
             # print(_)
             
         elif btn.text() == "ImageFolder...":
             print("choose the test Folder")
             self.srcImagePath = QFileDialog.getExistingDirectory(self, "choose the folder...", QDir.currentPath())
             self.pathLineEdit.setText(self.srcImagePath)
+            self.settings.setValue("SETTING/ImagePath", self.srcImagePath)
             # if not self.srcImagePath.endswith(
             #     ".raw"
             # ) and not self.srcImagePath.endswith(".bin"):
@@ -507,6 +538,9 @@ class UI_Image(QWidget, Show):
     
     def setLandMarkProcess(self, landMarkHandle):
         self.landmarkHandler = landMarkHandle
+
+    def setAgeGentleProcess(self, ageGentleHandle):
+        self.ageGentleHandler = ageGentleHandle
 
     def closeEvent(self, a0: QCloseEvent) -> None:
         print("close it")
